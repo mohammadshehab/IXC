@@ -1,0 +1,2148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler" name="GSM_ConsumerVIPStrategy" xmlns="http://jbpm.org/4.0/jpdl">
+   <start continue="async" g="481,1,48,48" name="start1">
+      <transition to="Check for Entry Criteria">
+         <script expr="12 hours" g="0,0,80,40" var="AUTOTIME"/>
+           <script expr="N" g="0,0,80,40" var="AUTORELEASE_FLAG"/>
+             <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+              <script expr="AUTO" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+             <script expr="N" g="0,0,80,40" var="RELEASEINMID_FLAG"/>
+      </transition>
+   </start>
+   <custom g="432,89,145,52" name="Collection Started" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="Check Workflow Type"/>
+   </custom>
+   <custom g="424,557,161,52" name="PC10 - SMS16" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="SMSAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="MSG_ID"/>
+               </key>
+               <value>
+                  <object expr="PC10"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Wait before 05-OD-01-PC13">
+      <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </custom>
+   <state continue="async" g="390,647,228,52" name="Wait before 05-OD-01-PC13">
+      <transition g="-101,-11" name="ContinueWorkflow" to="05-OD-01-PC13">
+         <timer duedate="7 business days" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+      <transition g="-40,-16" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+      <script expr="1" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+         <script expr="1" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+      <script expr="1" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="1" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+       <script expr="1" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="325,673:-5,-20" name="Hold" to="Tickler For Hold Entry">
+         <script expr="1" g="0,0,80,40" var="HOLD_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+       <script expr="1" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="1" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="90,673;90,1587:-5,-20" name="SD" to="PC40 - SD">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="69,673;69,1885;69,2782:-5,-20" name="Suspension" to="IN Deduction">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+   </state>
+   <task continue="async" g="404,809,200,52" name="05-OD-01-PC13">
+      <assignment-handler class="com.lhs.wma.wfms.jbpm4.WFMSTaskAssignment">
+         <field name="actionName">
+            <string value="05-OD-01-PC13"/>
+         </field>
+      </assignment-handler>
+      <transition g="29,76" name="PromiseToPay" to="Promise To Pay SubWF">
+         <script expr="2" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-117,88" name="Installment" to="Payment Plan SubWF">
+         <script expr="2" g="0,0,80,40" var="PTP_FLAG"/>      
+      </transition>
+      <transition g="-24,-22" name="NFU" to="05-OD-02-PC25"/>
+      <transition g="-45,16" name="ContinueWorkflow" to="PC15 - SMS17"/>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="2" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+      <transition g="325,834:-5,-20" name="Hold" to="Tickler For Hold Entry">
+         <script expr="2" g="0,0,80,40" var="HOLD_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="2" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="2" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="2" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="2" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="90,867;90,1463;90,1587:-5,-20" name="SD" to="PC40 - SD">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="69,853;69,1833;69,2782:-5,-20" name="Suspension" to="IN Deduction">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+   </task>
+   <task continue="async" g="414,1152,181,52" name="05-OD-02-PC25">
+      <assignment-handler class="com.lhs.wma.wfms.jbpm4.WFMSTaskAssignment">
+         <field name="actionName">
+            <string value="05-OD-02-PC25"/>
+         </field>
+      </assignment-handler>
+      <transition g="-17,10" name="PromiseToPay" to="Promise To Pay SubWF">
+          <script expr="3" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-2,3" name="Installment" to="Payment Plan SubWF">
+          <script expr="3" g="0,0,80,40" var="PTP_FLAG"/> 
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="3" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+      <transition g="325,1178:-5,-20" name="Hold" to="Tickler For Hold Entry">
+         <script expr="3" g="0,0,80,40" var="HOLD_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="3" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="3" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="3" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="3" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="90,1159;90,1587:-5,-20" name="SD" to="PC40 - SD">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="69,1145;69,2083;69,2782:-5,-20" name="Suspension" to="IN Deduction">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+   </task>
+   <custom g="799,810,162,52" name="PC15 - SMS17" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="SMSAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="MSG_ID"/>
+               </key>
+               <value>
+                  <object expr="PC15"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Wait Before 05-OD-02-PC25">
+      <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </custom>
+   <decision g="855,1367,200,48" name="Check Roaming Flag Before SD">
+      <transition g="-5,-20" name="Yes" to="01-ROAM-11-VIPRFSD">
+         <condition expr="${ROAMING_FLAG&gt;0}"/>
+      </transition>
+      <transition g="-5,-20" name="SD" to="PC40 - SD">
+         <condition expr="${ROAMING_FLAG==0}"/>
+          <script expr="AUTO" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+   </decision>
+   <custom g="827,1458,105,52" name="PC40 - SD" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ProvisioningRevampAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="PROVIDING_ACTION"/>
+               </key>
+               <value>
+                  <object expr="SD"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WF_STEP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Provisioning Wait"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition g="-5,-20" name="ErrorHandler" to="ActionError">
+        <script expr="1" g="0,0,80,40" var="ERROR_FLAG"/>
+      </transition>
+      <transition to="Provisioning Wait Forever After SD">
+      </transition>
+   </custom>
+   <task continue="async" g="1144,1366,210,52" name="01-ROAM-11-VIPRFSD">
+      <assignment-handler class="com.lhs.wma.wfms.jbpm4.WFMSTaskAssignment">
+         <field name="actionName">
+            <string value="01-ROAM-11-VIPRFSD"/>
+         </field>
+      </assignment-handler>
+      <transition g="811,1353:-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+         <script expr="4" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+         <script expr="4" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="1249,1484:-172,-18" name="SD" to="PC40 - SD">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="4" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+      <transition g="325,1468:-5,-20" name="Hold" to="Tickler For Hold Entry">
+         <script expr="4" g="0,0,80,40" var="HOLD_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="4" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="4" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="4" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="4" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="IN Deduction">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+   </task>
+   <state continue="async" g="771,1776,219,52" name="Wait Before SMS PC46">
+      <transition g="643,1695:-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+         <script expr="5" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-109,-7" name="ContinueWorkflow" to="PC46 - SMS7">
+         <timer duedate="4 business days" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+      <script expr="5" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="5" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+      <transition g="325,1728:-5,-20" name="Hold" to="Tickler For Hold Entry">
+         <script expr="5" g="0,0,80,40" var="HOLD_FLAG"/>
+      </transition>
+      <transition g="1628,1925:-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="5" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="5" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="5" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="5" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="5" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="904,1636:-5,-20" name="SD" to="PC40 - SD">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="69,1767;69,2782:-5,-20" name="Suspension" to="IN Deduction">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+   </state>
+   <custom g="804,1883,152,52" name="PC46 - SMS7" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="SMSAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="MSG_ID"/>
+               </key>
+               <value>
+                  <object expr="PC46"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Wait Before 05-OD-03-PC47">
+      <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </custom>
+   <state continue="async" g="770,1985,218,52" name="Wait Before 05-OD-03-PC47">
+      <transition g="-115,-8" name="ContinueWorkflow" to="05-OD-03-PC47">
+         <timer duedate="4 business days" startdate="${WAITING_ENTRY_DATE}"/>
+        <script expr="${calendar:getDate()}" g="0,0,80,40" var="TASK_ENTRY_DATE"/>
+      </transition>
+      <transition g="643,2010:-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+         <script expr="6" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+      <script expr="6" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="6" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+      <transition g="325,2037:-5,-20" name="Hold" to="Tickler For Hold Entry">
+         <script expr="6" g="0,0,80,40" var="HOLD_FLAG"/>
+      </transition>
+      <transition g="1628,2011:-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="6" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="6" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="6" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="6" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="6" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="715,1758:-5,-20" name="SD" to="PC40 - SD">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="69,2112;69,2782:-5,-20" name="Suspension" to="IN Deduction">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+   </state>
+   <task continue="async" duedate="4 business days" g="774,2184,212,52" name="05-OD-03-PC47" startdate="${TASK_ENTRY_DATE}">
+      <assignment-handler class="com.lhs.wma.wfms.jbpm4.WFMSTaskAssignment">
+         <field name="actionName">
+            <string value="05-OD-03-PC47"/>
+         </field>
+      </assignment-handler>
+      <transition g="643,2210:-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+         <script expr="7" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+         <script expr="7" g="0,0,80,40" var="PTP_FLAG"/>      
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="7" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+      <transition g="325,2235:-5,-20" name="Hold" to="Tickler For Hold Entry">
+         <script expr="7" g="0,0,80,40" var="HOLD_FLAG"/>
+      </transition>
+      <transition g="678,2210;678,2782:0,137" name="Suspension" to="IN Deduction">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="1628,2209:-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="7" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="7" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="7" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="7" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="7" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="706,1743:-5,-20" name="SD" to="PC40 - SD">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="525,2436:-5,-20" name="ContinueWorkflow" to="IN Deduction"/>
+      <on event="timeout">
+         <timer duedate="4 business days" startdate="${TASK_ENTRY_DATE}"/>
+         <event-listener class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment">
+               <field name="actionName">
+                  <string value="ExecuteEventAction"/>
+               </field>
+               <field name="variables">
+                  <map class="java.util.HashMap">
+                     <entry>
+                        <key>
+                           <string value="EVENT_ID"/>
+                        </key>
+                        <value>
+                           <object expr="15"/>
+                        </value>
+                     </entry>
+                  </map>
+               </field>
+         </event-listener>
+      </on>
+   </task>
+   <decision g="856,2616,220,48" name="CheckRoamingFlagBeforeSuspension">
+      <transition g="-5,-20" name="Yes" to="01-ROAM-12-VIPRFSP">
+         <condition expr="${ROAMING_FLAG&gt;0}"/>
+      </transition>
+      <transition g="8,-17" name="Suspension" to="IN Deduction">
+         <condition expr="${ROAMING_FLAG==0}"/>
+          <script expr="AUTO" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+   </decision>
+   <end g="859,3818,48,48" name="end1"/>
+   <custom g="788,3701,188,52" name="Collection Ended" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ImportInterfaceAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="ACTIVITY_TYPE"/>
+               </key>
+               <value>
+                  <object expr="CollectionEnded"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="IXC_UPDATE"/>
+               </key>
+               <value>
+                  <object expr="Y"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="end1"/>
+      <transition g="-5,-20" name="ErrorHandler" to="ActionError">
+         <script expr="10" g="0,0,80,40" var="ERROR_FLAG"/>
+      </transition>
+   </custom>
+   <sub-process g="549,1340,190,52" name="Promise To Pay SubWF" sub-process-key="GSM_SUBWF_PromiseStrategy">
+        <parameter-out subvar="BP_ACTION_I" var="BP_ACTION_I"/>
+     
+      <transition g="-5,-20" name="Hold" to="Tickler For Hold Entry">
+          <script expr="${PTP_FLAG}" g="0,0,80,40" var="HOLD_FLAG"/>
+             <script expr="P2P_M" g="0,0,80,40" var="IXC_STEP"/>
+               <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+      <transition g="-51,8" name="KeptPromise" to="Check IMPT Rule After Kept Promise">
+         <script expr="P2P_M" g="0,0,80,40" var="IXC_STEP"/>
+      </transition>
+      <transition g="346,1447:1,-12" name="CancelPromise" to="Check for Intermediate P2P Flag">
+         <script expr="P2P_M" g="0,0,80,40" var="IXC_STEP"/>
+      </transition>
+      <transition g="-5,-20" name="BrokenPromise" to="03-BP-01-PCBP1">
+         <script expr="P2P_M" g="0,0,80,40" var="IXC_STEP"/>
+           <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+      <transition g="569,1477;569,2428:-5,-20" name="Suspension" to="Holiday Action Before Suspension PC55">
+        <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+      <transition g="-5,-20" name="SD" to="Holiday Action Before SD PC40">
+        <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+      <transition g="369,1484:-5,-20" name="P2PSetupFailed" to="Check for Intermediate P2P Flag">
+         <script expr="P2P_M" g="0,0,80,40" var="IXC_STEP"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule"/>
+   </sub-process>
+   <custom g="802,3018,155,52" name="PC55 - Suspension" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ProvisioningRevampAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="PROVIDING_ACTION"/>
+               </key>
+               <value>
+                  <object expr="Suspension"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WF_STEP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Provisioning Wait"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition g="-5,-20" name="ErrorHandler" to="ActionError">
+        <script expr="2" g="0,0,80,40" var="ERROR_FLAG"/>
+      </transition>
+      <transition to="Provisioning Wait Forever After Suspension">
+      </transition>
+   </custom>
+   <sub-process g="192,1329,228,52" name="Payment Plan SubWF" sub-process-key="GSM_SUBWF_PaymentPlanSubWF">
+      <transition g="-5,-20" name="Hold" to="Tickler For Hold Entry">
+          <script expr="${PTP_FLAG}" g="0,0,80,40" var="HOLD_FLAG"/>
+            <script expr="PaymentPlan_M" g="0,0,80,40" var="IXC_STEP"/>
+              <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+      
+      <transition g="-25,13" name="KeptPromise" to="Check IMPT Rule After Kept Promise">
+        <script expr="PaymentPlan_M" g="0,0,80,40" var="IXC_STEP"/>
+      </transition>
+      <transition g="-5,-20" name="CancelPaymentPlan" to="Check for Intermediate P2P Flag">
+        <script expr="PaymentPlan_M" g="0,0,80,40" var="IXC_STEP"/>
+      </transition>
+      <transition g="347,1607:-5,-20" name="BrokenPromise" to="03-BP-01-PCBP1">
+        <script expr="PaymentPlan_M" g="0,0,80,40" var="IXC_STEP"/>
+          <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+      <transition g="182,1409:-5,-20" name="PPSetupFailed" to="Check for Intermediate P2P Flag"/>
+       <transition g="-5,-20" name="Invoice" to="Check IMPT Rule"/>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule"/>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule"/>
+   </sub-process>
+   <state continue="async" g="1190,716,255,52" name="Wait for AutoRelease Max Scheduled Time">
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="Y" g="0,0,80,40" var="AUTORELEASE_FLAG"/>
+      </transition>
+      <transition g="1478,710:-35,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="Y" g="0,0,80,40" var="AUTORELEASE_FLAG"/>
+      </transition>
+      <transition g="1478,710:-35,-20" name="Invoice" to="Check IMPT Rule">
+        <script expr="Y" g="0,0,80,40" var="AUTORELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+       <script expr="N" g="0,0,80,40" var="RELEASEINMID_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+          <script expr="22" g="0,0,80,40" var="RELEASE_FLAG"/>
+           <script expr="N" g="0,0,80,40" var="RELEASEINMID_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+         <script expr="22" g="0,0,80,40" var="RELEASE_FLAG"/>
+          <script expr="N" g="0,0,80,40" var="RELEASEINMID_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+         <script expr="22" g="0,0,80,40" var="RELEASE_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="AUTORELEASE_FLAG"/>
+          <script expr="N" g="0,0,80,40" var="RELEASEINMID_FLAG"/>
+      </transition>
+      <transition g="1323,689;1337,700:-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time"/>
+      <transition g="-44,-18" name="ContinueWorkflow" to="Check State Between Release SD and Suspension">
+         <timer duedate="${AUTOTIME}"/>
+      </transition>
+   </state>
+   <custom g="770,2402,220,52" name="Holiday Action Before Suspension PC55" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="HolidayAction"/>
+      </field>
+      <transition to="Check Working Day Beore Suspension"/>
+   </custom>
+   <decision g="856,2512,230,48" name="Check Working Day Beore Suspension">
+      <transition g="5,-3" name="Yes" to="CheckRoamingFlagBeforeSuspension">
+         <condition expr="${IS_WORKING_DAY==&apos;T&apos;}"/>
+      </transition>
+      <transition g="-5,-20" name="No" to="Wait For 1 Day Before Suspension PC55">
+         <condition expr="${IS_WORKING_DAY!=&apos;T&apos;}"/>
+         <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </decision>
+   <state continue="async" g="1039,2510,242,52" name="Wait For 1 Day Before Suspension PC55">
+      <transition g="1149,2427:-100,4" name="ContinueWorkflow" to="Holiday Action Before Suspension PC55">
+         <timer duedate="1 business day" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+      <transition g="643,2465:-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+      <script expr="13" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+      <script expr="13" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="13" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+      <transition g="576,2481:-5,-20" name="Hold" to="Tickler For Hold Entry">
+         <script expr="13" g="0,0,80,40" var="HOLD_FLAG"/>
+      </transition>
+      <transition g="1628,2536:-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="13" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="1175,1626;1196,1230:-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="13" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="13" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="13" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="13" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SD" to="PC40 - SD">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="IN Deduction">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+   </state>
+   <task continue="async" g="1310,2614,177,52" name="01-ROAM-12-VIPRFSP">
+      <assignment-handler class="com.lhs.wma.wfms.jbpm4.WFMSTaskAssignment">
+         <field name="actionName">
+            <string value="01-ROAM-12-VIPRFSP"/>
+         </field>
+      </assignment-handler>
+      <transition g="643,2572:-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+         <script expr="9" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+         <script expr="9" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="1398,2783:-158,-18" name="Suspension" to="IN Deduction">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="9" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+      <transition g="325,2571:-5,-20" name="Hold" to="Tickler For Hold Entry">
+         <script expr="9" g="0,0,80,40" var="HOLD_FLAG"/>
+      </transition>
+      <transition g="1628,2640:-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="9" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="9" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="9" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="9" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="9" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SD" to="PC40 - SD">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+   </task>
+   <custom g="790,1153,180,52" name="Holiday Action Before SD PC40" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="HolidayAction"/>
+      </field>
+      <transition to="Check Working Day Before SD"/>
+   </custom>
+   <decision g="855,1251,195,48" name="Check Working Day Before SD">
+      <transition g="7,-5" name="Yes" to="Check Roaming Flag Before SD">
+         <condition expr="${IS_WORKING_DAY==&apos;T&apos;}"/>
+      </transition>
+      <transition g="-5,-20" name="No" to="Wait For 1 Day Before SD PC40">
+         <condition expr="${IS_WORKING_DAY!=&apos;T&apos;}"/>
+         <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </decision>
+   <state continue="async" g="1088,1249,190,52" name="Wait For 1 Day Before SD PC40">
+      <transition g="1183,1178:-101,5" name="ContinueWorkflow" to="Holiday Action Before SD PC40">
+         <timer duedate="1 business day" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+      <script expr="12" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+      <script expr="12" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="12" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+      <transition g="325,1207:-5,-20" name="Hold" to="Tickler For Hold Entry">
+         <script expr="12" g="0,0,80,40" var="HOLD_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="12" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="12" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-4,-23" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="12" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="12" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SD" to="PC40 - SD">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="IN Deduction">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+   </state>
+   <decision g="464,1375,260,48" name="Check Customer Amount After Kept Promise">
+      <transition g="488,2051;488,3295;488,3644;1288,3644:3,13" name="IXC_Exit" to="Wait For 12 hours Before Exit">
+         <condition expr="${CUSTOMER_AMOUNT&lt;25}"/>
+          <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+      <transition g="-5,-20" name="No" to="Check for Intermediate P2P Flag">
+         <condition expr="${CUSTOMER_AMOUNT&gt;=25}"/>
+      </transition>
+   </decision>
+   <task continue="async" g="287,1658,250,52" name="03-BP-01-PCBP1">
+      <assignment-handler class="com.lhs.wma.wfms.jbpm4.WFMSTaskAssignment">
+         <field name="actionName">
+            <string value="03-BP-01-PCBP1"/>
+         </field>
+      </assignment-handler>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="Y" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="Y" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="17" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+      <transition g="325,1764:-5,-20" name="Hold" to="Tickler For Hold Entry">
+         <script expr="17" g="0,0,80,40" var="HOLD_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="17" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="17" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="17" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="17" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="17" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="17" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="17" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SD" to="PC40 - SD">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="IN Deduction">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Call_Out_VIP_befSD" to="05-OD-02-PC25"/>
+      <transition g="-5,-20" name="Call_Out_VIP_befSusp" to="05-OD-03-PC47"/>
+      <transition g="334,1627;328,1643:-5,-20" name="CancelPaymentPlan" to="03-BP-01-PCBP1"/>
+   </task>
+   <decision g="164,1574,235,48" name="Select PTP_FLAG For Different State">
+      <transition to="Wait before 05-OD-01-PC13">
+         <condition expr="${PTP_FLAG==&apos;1&apos;}"/>
+      </transition>
+      <transition to="05-OD-01-PC13">
+         <condition expr="${PTP_FLAG==&apos;2&apos;}"/>
+      </transition>
+      <transition to="05-OD-02-PC25">
+         <condition expr="${PTP_FLAG==&apos;3&apos;}"/>
+      </transition>
+      <transition to="01-ROAM-11-VIPRFSD">
+         <condition expr="${PTP_FLAG==&apos;4&apos;}"/>
+      </transition>
+      <transition to="Wait Before SMS PC46">
+         <condition expr="${PTP_FLAG==&apos;5&apos;}"/>
+      </transition>
+      <transition to="Wait Before 05-OD-03-PC47">
+         <condition expr="${PTP_FLAG==&apos;6&apos;}"/>
+      </transition>
+      <transition to="05-OD-03-PC47">
+         <condition expr="${PTP_FLAG==&apos;7&apos;}"/>
+      </transition>
+      <transition to="01-ROAM-12-VIPRFSP">
+         <condition expr="${PTP_FLAG==&apos;9&apos;}"/>
+      </transition>
+      <transition to="Wait 14 Days Before Final Strategy">
+         <condition expr="${PTP_FLAG==&apos;11&apos;}"/>
+      </transition>
+      <transition to="02-OOPS-10-VIPOOPS">
+         <condition expr="${PTP_FLAG==&apos;10&apos;}"/>
+      </transition>
+      <transition to="Wait Before 05-OD-02-PC25">
+         <condition expr="${PTP_FLAG==&apos;16&apos;}"/>
+      </transition>
+      <transition to="Wait For 1 Day Before SD PC40">
+         <condition expr="${PTP_FLAG==&apos;12&apos;}"/>
+      </transition>
+      <transition to="Wait For 1 Day Before Suspension PC55">
+         <condition expr="${PTP_FLAG==&apos;13&apos;}"/>
+      </transition>
+      <transition to="04-HOLD-01-PCHOLD">
+         <condition expr="${PTP_FLAG==&apos;15&apos;}"/>
+      </transition>
+      <transition to="01-ROAM-03-VIPRoam">
+         <condition expr="${PTP_FLAG==&apos;14&apos;}"/>
+      </transition>
+      <transition to="03-BP-01-PCBP1">
+         <condition expr="${PTP_FLAG==&apos;17&apos;}"/>
+      </transition>
+   </decision>
+   <task continue="async" g="2181,1472,150,52" name="02-OOPS-10-VIPOOPS">
+      <assignment-handler class="com.lhs.wma.wfms.jbpm4.WFMSTaskAssignment">
+         <field name="actionName">
+            <string value="02-OOPS-10-VIPOOPS"/>
+         </field>
+      </assignment-handler>
+      <transition g="-5,-20" name="Installment" to="Reset OOPS Flag">
+         <script expr="10" g="0,0,80,40" var="PTP_FLAG"/>
+           <script expr="2" g="0,0,80,40" var="SETOOPS_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Reset OOPS Flag">
+         <script expr="10" g="0,0,80,40" var="PTP_FLAG"/>
+           <script expr="1" g="0,0,80,40" var="SETOOPS_FLAG"/>
+      </transition>
+      <transition g="-54,-1" name="Call_Out_VIP_befSD" to="Set OOPS Flag"/>
+      <transition g="-5,-20" name="Hold" to="Reset OOPS Flag">
+         <script expr="10" g="0,0,80,40" var="HOLD_FLAG"/>
+           <script expr="3" g="0,0,80,40" var="SETOOPS_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="10" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="10" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="10" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="10" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="10" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="10" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="10" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="Reset OOPS Flag">
+        <script expr="5" g="0,0,80,40" var="SETOOPS_FLAG"/>
+      </transition>
+      <transition g="-25,14" name="Call_Out_VIP_befSusp" to="Set OOPS flag"/>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag in OOPS State"/>
+      <transition g="-5,-20" name="SD" to="Reset OOPS Flag">
+        <script expr="4" g="0,0,80,40" var="SETOOPS_FLAG"/>
+      </transition>
+   </task>
+   <state continue="async" g="767,3432,230,52" name="Wait 14 Days Before Final Strategy">
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+         <script expr="11" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+         <script expr="11" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="11" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+      <transition g="325,3458:-5,-20" name="Hold" to="Tickler For Hold Entry">
+         <script expr="11" g="0,0,80,40" var="HOLD_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="11" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="11" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="11" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="11" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="11" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="11" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="11" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="699,2387:-5,-20" name="SD" to="PC40 - SD">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="584,2984:-5,-20" name="Suspension" to="IN Deduction">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="3,-14" name="ContinueWorkflow" to="Collection Final Strategy">
+         <timer duedate="${14-SUSPENSION_DAYS} business days" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+   </state>
+   <state continue="async" g="788,999,185,52" name="Wait Before 05-OD-02-PC25">
+      <transition g="504,1025:120,2" name="ContinueWorkflow" to="05-OD-02-PC25">
+         <timer duedate="5 business days" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+      <script expr="16" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+      <script expr="16" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="16" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+      <transition g="325,1068:-5,-20" name="Hold" to="Tickler For Hold Entry">
+         <script expr="16" g="0,0,80,40" var="HOLD_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="16" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="16" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="16" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="16" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="90,964;90,1587:-5,-20" name="SD" to="PC40 - SD">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="69,942;69,1654;69,2357;69,2782:-5,-20" name="Suspension" to="IN Deduction">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+   </state>
+   <custom g="820,2757,120,52" name="IN Deduction" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ProvisioningRevampAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="PROVIDING_ACTION"/>
+               </key>
+               <value>
+                  <object expr="IN"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WF_STEP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Provisioning Wait"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Check In Flag Value">
+      <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </custom>
+   <state continue="async" g="722,2896,315,52" name="Provisioning Wait for IN Deduction Max. Wait Period">
+      <transition g="-5,-20" name="ContinueWorkflow" to="PC55 - Suspension">
+      </transition>
+      <transition g="627,2922;627,3044:-5,-20" name="InDeduction" to="PC55 - Suspension"/>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+         <script expr="41" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="41" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="41" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="41" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag"/>
+   </state>
+   <task continue="async" g="253,2485,145,52" name="04-HOLD-01-PCHOLD">
+      <assignment-handler class="com.lhs.wma.wfms.jbpm4.WFMSTaskAssignment">
+         <field name="actionName">
+            <string value="04-HOLD-01-PCHOLD"/>
+         </field>
+      </assignment-handler>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+      <script expr="15" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+      <script expr="15" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="15" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="15" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="15" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="15" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="15" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="15" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="15" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="15" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SD" to="PC40 - SD">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="IN Deduction">
+       <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Call_Out_VIP_befSusp" to="Tickler for Hold Exit"/>
+      <transition g="-5,-20" name="Call_Out_VIP_befSD" to="Tickler For Hold Exit"/>
+   </task>
+   <decision g="1855,1474,225,48" name="Check OOPS or Roaming Report Flag">
+      <transition g="-5,-20" name="Yes" to="01-ROAM-03-VIPRoam">
+         <condition expr="${ROAMING_REPORT_FLAG==&apos;Y&apos;}"/>
+      </transition>
+      <transition g="-5,-20" name="No" to="02-OOPS-10-VIPOOPS">
+         <condition expr="${ROAMING_REPORT_FLAG!=&apos;Y&apos;}"/>
+      </transition>
+   </decision>
+   <task continue="async" g="1805,1338,150,52" name="01-ROAM-03-VIPRoam">
+      <assignment-handler class="com.lhs.wma.wfms.jbpm4.WFMSTaskAssignment">
+         <field name="actionName">
+            <string value="01-ROAM-03-VIPRoam"/>
+         </field>
+      </assignment-handler>
+      <transition g="6,-15" name="Call_Out_VIP_befSD" to="Set Roaming Report Flag"/>
+      <transition g="-5,-20" name="Installment" to="Reset Roaming Report Flag">
+      <script expr="14" g="0,0,80,40" var="PTP_FLAG"/>
+        <script expr="2" g="0,0,80,40" var="SETRRPT_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Reset Roaming Report Flag">
+      <script expr="14" g="0,0,80,40" var="PTP_FLAG"/>
+        <script expr="1" g="0,0,80,40" var="SETRRPT_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Hold" to="Reset Roaming Report Flag">
+         <script expr="14" g="0,0,80,40" var="HOLD_FLAG"/>
+           <script expr="3" g="0,0,80,40" var="SETRRPT_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="14" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="14" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="14" g="0,0,80,40" var="RELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="14" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="14" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="14" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="14" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="Reset Roaming Report Flag">
+        <script expr="5" g="0,0,80,40" var="SETRRPT_FLAG"/>
+      </transition>
+      <transition g="-55,-4" name="Call_Out_VIP_befSusp" to="Set Roaming Report flag"/>
+      <transition g="1919,1313;1927,1325:-5,-20" name="IMPT" to="01-ROAM-03-VIPRoam"/>
+      <transition g="-5,-20" name="SD" to="Reset Roaming Report Flag">
+        <script expr="4" g="0,0,80,40" var="SETRRPT_FLAG"/>
+      </transition>
+   </task>
+   <custom g="2180,1337,150,52" name="Set OOPS Flag IMPT" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="UpdateWorkflowAttributeAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_PUB"/>
+               </key>
+               <value>
+                  <object expr="OOPS_FLAG"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_TYPE"/>
+               </key>
+               <value>
+                  <object expr="V"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_VALUE"/>
+               </key>
+               <value>
+                  <object expr="N"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="01-ROAM-03-VIPRoam"/>
+   </custom>
+   <custom g="1914,1418,175,52" name="Set Roaming Report Flag" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="UpdateWorkflowAttributeAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_PUB"/>
+               </key>
+               <value>
+                  <object expr="ROAMING_REPORT_FLAG"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_TYPE"/>
+               </key>
+               <value>
+                  <object expr="V"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_VALUE"/>
+               </key>
+               <value>
+                  <object expr="N"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="05-OD-02-PC25"/>
+   </custom>
+   <custom g="2081,1624,125,52" name="Set OOPS Flag" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="UpdateWorkflowAttributeAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_PUB"/>
+               </key>
+               <value>
+                  <object expr="OOPS_FLAG"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_TYPE"/>
+               </key>
+               <value>
+                  <object expr="V"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_VALUE"/>
+               </key>
+               <value>
+                  <object expr="N"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="05-OD-02-PC25"/>
+   </custom>
+   <decision g="1633,717,135,48" name="Check IMPT Rule">
+      <transition g="-5,-20" name="No" to="Check Customer Amount">
+         <condition expr="${OOPS_FLAG!=&apos;Y&apos; &amp;&amp; ROAMING_REPORT_FLAG!=&apos;Y&apos;}"/>
+      </transition>
+      <transition g="-5,-20" name="Yes" to="Check State Between Release SD and Suspension">
+         <condition expr="${OOPS_FLAG==&apos;Y&apos; || ROAMING_REPORT_FLAG==&apos;Y&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="1626,980,165,48" name="Check Customer Amount">
+      <transition g="-5,-20" name="No" to="Check Autorelease Flag">
+         <condition expr="${CUSTOMER_AMOUNT&gt;=25}"/>
+      </transition>
+      <transition g="1650,2007;1650,2677;1650,3082;1650,3296;1650,3580;1650,3727:-5,-20" name="IXC_Exit" to="Wait For 12 hours Before Exit">
+         <condition expr="${CUSTOMER_AMOUNT&lt;25}"/>
+          <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </decision>
+   <decision g="1342,980,190,48" name="Select State After Payment">
+      <transition to="Wait before 05-OD-01-PC13">
+         <condition expr="${PAYNINV_FLAG==&apos;1&apos;}"/>
+      </transition>
+      <transition to="05-OD-01-PC13">
+         <condition expr="${PAYNINV_FLAG==&apos;2&apos;}"/>
+      </transition>
+      <transition to="Wait Before 05-OD-02-PC25">
+         <condition expr="${PAYNINV_FLAG==&apos;16&apos;}"/>
+      </transition>
+      <transition to="05-OD-02-PC25">
+         <condition expr="${PAYNINV_FLAG==&apos;3&apos;}"/>
+      </transition>
+      <transition to="Wait For 1 Day Before SD PC40">
+         <condition expr="${PAYNINV_FLAG==&apos;12&apos;}"/>
+      </transition>
+      <transition to="01-ROAM-11-VIPRFSD">
+         <condition expr="${PAYNINV_FLAG==&apos;4&apos;}"/>
+      </transition>
+      <transition to="Wait Before SMS PC46">
+         <condition expr="${PAYNINV_FLAG==&apos;5&apos;}"/>
+      </transition>
+      <transition to="Wait Before 05-OD-03-PC47">
+         <condition expr="${PAYNINV_FLAG==&apos;6&apos;}"/>
+      </transition>
+      <transition to="05-OD-03-PC47">
+         <condition expr="${PAYNINV_FLAG==&apos;7&apos;}"/>
+      </transition>
+      <transition to="Wait For 1 Day Before Suspension PC55">
+         <condition expr="${PAYNINV_FLAG==&apos;13&apos;}"/>
+      </transition>
+      <transition to="01-ROAM-12-VIPRFSP">
+         <condition expr="${PAYNINV_FLAG==&apos;9&apos;}"/>
+      </transition>
+      <transition to="Provisioning Wait for IN Deduction Max. Wait Period">
+         <condition expr="${PAYNINV_FLAG==&apos;18&apos;}"/>
+      </transition>
+      <transition to="Wait 14 Days Before Final Strategy">
+         <condition expr="${PAYNINV_FLAG==&apos;11&apos;}"/>
+      </transition>
+      <transition to="03-BP-01-PCBP1">
+         <condition expr="${PAYNINV_FLAG==&apos;17&apos;}"/>
+      </transition>
+      <transition to="04-HOLD-01-PCHOLD">
+         <condition expr="${PAYNINV_FLAG==&apos;15&apos;}"/>
+      </transition>
+      <transition to="01-ROAM-03-VIPRoam">
+         <condition expr="${PAYNINV_FLAG==&apos;14&apos;}"/>
+      </transition>
+      <transition to="02-OOPS-10-VIPOOPS">
+         <condition expr="${PAYNINV_FLAG==&apos;10&apos;}"/>
+      </transition>
+      <transition to="ActionError Wait">
+         <condition expr="${PAYNINV_FLAG==&apos;20&apos;}"/>
+      </transition>
+      <transition to="Early Entry Wait">
+         <condition expr="${PAYNINV_FLAG==&apos;21&apos;}"/>
+      </transition>
+       <transition to="Provisioning Wait for IN Deduction Max. Wait Period">
+         <condition expr="${PAYNINV_FLAG==&apos;41&apos;}"/>
+      </transition>
+      <transition to="Provisioning Wait Forever After SD">
+         <condition expr="${PAYNINV_FLAG==&apos;42&apos;}"/>
+      </transition>
+      <transition to="Provisioning Wait Forever After Suspension">
+         <condition expr="${PAYNINV_FLAG==&apos;43&apos;}"/>
+      </transition>
+      <transition to="Provisioning Wait Forever After Release">
+         <condition expr="${PAYNINV_FLAG==&apos;44&apos;}"/>
+      </transition>
+      <transition to="Provisioning Wait Forever After Release1">
+         <condition expr="${PAYNINV_FLAG==&apos;45&apos;}"/>
+      </transition>
+   </decision>
+   <custom g="1923,2841,115,52" name="Release SD1" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ProvisioningRevampAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="PROVIDING_ACTION"/>
+               </key>
+               <value>
+                  <object expr="ReleaseSD"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WF_STEP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Provisioning Wait"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition g="-5,-20" name="ErrorHandler" to="ActionError">
+        <script expr="6" g="0,0,80,40" var="ERROR_FLAG"/>
+      </transition>
+      <transition to="Check Wait After Release"/>
+   </custom>
+   <custom g="1312,3097,195,52" name="Release Suspension" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ProvisioningRevampAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="PROVIDING_ACTION"/>
+               </key>
+               <value>
+                  <object expr="ReleaseSuspension"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WF_STEP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Provisioning Wait"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition g="-5,-20" name="ErrorHandler" to="ActionError">
+        <script expr="4" g="0,0,80,40" var="ERROR_FLAG"/>
+      </transition>
+      <transition to="Check Wait After Release"/>
+   </custom>
+   <custom g="1573,2840,110,52" name="Release SD" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ProvisioningRevampAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="PROVIDING_ACTION"/>
+               </key>
+               <value>
+                  <object expr="ReleaseSD"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WF_STEP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Provisioning Wait"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition g="-5,-20" name="ErrorHandler" to="ActionError">
+        <script expr="3" g="0,0,80,40" var="ERROR_FLAG"/>
+      </transition>
+      <transition to="Check Wait After Release"/>
+   </custom>
+   <custom g="1881,2594,200,52" name="Release Suspension1" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ProvisioningRevampAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="PROVIDING_ACTION"/>
+               </key>
+               <value>
+                  <object expr="ReleaseSuspension"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WF_STEP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Provisioning Wait"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition g="-5,-20" name="ErrorHandler" to="ActionError">
+        <script expr="5" g="0,0,80,40" var="ERROR_FLAG"/>
+      </transition>
+      <transition to="Provisioning Wait Between Release Suspension and Release SD"/>
+   </custom>
+   <decision g="1367,2910,190,48" name="Select State After Release">
+      <transition to="Wait Before SMS PC46">
+         <condition expr="${RELEASE_FLAG==&apos;5&apos;}"/>
+      </transition>
+      <transition to="Wait Before 05-OD-03-PC47">
+         <condition expr="${RELEASE_FLAG==&apos;6&apos;}"/>
+      </transition>
+      <transition to="05-OD-03-PC47">
+         <condition expr="${RELEASE_FLAG==&apos;7&apos;}"/>
+      </transition>
+      <transition to="Wait For 1 Day Before Suspension PC55">
+         <condition expr="${RELEASE_FLAG==&apos;13&apos;}"/>
+      </transition>
+      <transition to="01-ROAM-12-VIPRFSP">
+         <condition expr="${RELEASE_FLAG==&apos;9&apos;}"/>
+      </transition>
+      <transition to="Wait 14 Days Before Final Strategy">
+         <condition expr="${RELEASE_FLAG==&apos;11&apos;}"/>
+      </transition>
+      <transition to="04-HOLD-01-PCHOLD">
+         <condition expr="${RELEASE_FLAG==&apos;15&apos;}"/>
+      </transition>
+      <transition to="03-BP-01-PCBP1">
+         <condition expr="${RELEASE_FLAG==&apos;17&apos;}"/>
+      </transition>
+      <transition to="02-OOPS-10-VIPOOPS">
+         <condition expr="${RELEASE_FLAG==&apos;10&apos;}"/>
+      </transition>
+      <transition to="01-ROAM-03-VIPRoam">
+         <condition expr="${RELEASE_FLAG==&apos;14&apos;}"/>
+      </transition>
+      <transition to="Wait for AutoRelease Max Scheduled Time">
+         <condition expr="${RELEASE_FLAG==&apos;22&apos;}"/>
+      </transition>
+      <transition to="Wait For 6 hours">
+         <condition expr="${RELEASE_FLAG==&apos;23&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="464,1231,230,48" name="Check IMPT Rule After Kept Promise">
+      <transition g="-5,-20" name="No" to="Check Customer Amount After Kept Promise">
+         <condition expr="${OOPS_FLAG!=&apos;Y&apos; &amp;&amp; ROAMING_REPORT_FLAG!=&apos;Y&apos;}"/>
+      </transition>
+      <transition g="343,1409:-5,-20" name="Yes" to="Check for Intermediate P2P Flag">
+         <condition expr="${OOPS_FLAG==&apos;Y&apos; || ROAMING_REPORT_FLAG==&apos;Y&apos;}"/>
+      </transition>
+   </decision>
+   <sub-process g="790,3568,185,52" name="Collection Final Strategy" sub-process-key="GSM_SUBWF_ConsumerFinalStrategy">
+      <transition g="3,-19" name="IXC_Exit" to="Collection Ended"/>
+   </sub-process>
+   <custom g="1286,3530,142,52" name="ActionError" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="ActionError Wait">
+      <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </custom>
+   <state continue="async" g="1601,3529,158,52" name="ActionError Wait">
+      <transition g="-5,-20" name="ContinueWorkflow" to="Select State After ActionError Wait">
+         <timer duedate="12 hours" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="20" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="20" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="20" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="20" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+         <script expr="20" g="0,0,80,40" var="IMPT_FLAG"/>
+      </transition>
+   </state>
+   <decision g="1842,3362,235,48" name="Select State After ActionError Wait">
+      <transition to="PC40 - SD">
+         <condition expr="${ERROR_FLAG==&apos;1&apos;}"/>
+      </transition>
+      <transition to="PC55 - Suspension">
+         <condition expr="${ERROR_FLAG==&apos;2&apos;}"/>
+      </transition>
+      <transition to="Release SD">
+         <condition expr="${ERROR_FLAG==&apos;3&apos;}"/>
+      </transition>
+      <transition to="Release Suspension">
+         <condition expr="${ERROR_FLAG==&apos;4&apos;}"/>
+      </transition>
+      <transition to="Release Suspension1">
+         <condition expr="${ERROR_FLAG==&apos;5&apos;}"/>
+      </transition>
+      <transition to="Release SD1">
+         <condition expr="${ERROR_FLAG==&apos;6&apos;}"/>
+      </transition>
+      <transition to="Collection Ended">
+         <condition expr="${ERROR_FLAG==&apos;10&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="1518,980,170,48" name="Check Autorelease Flag">
+      <transition to="Check State Between Release SD and Suspension">
+         <condition expr="${AUTORELEASE_FLAG==&apos;N&apos;}"/>
+      </transition>
+      <transition to="Check Provisioning Wait Flag">
+         <condition expr="${AUTORELEASE_FLAG==&apos;Y&apos;}"/>
+      </transition>
+   </decision>
+   <state continue="async" g="1460,1126,165,52" name="Wait For 6 hours">
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule"/>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule"/>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule"/>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+       <script expr="N" g="0,0,80,40" var="RELEASEINMID_FLAG"/>
+        <script expr="N" g="0,0,80,40" var="AUTORELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+         <script expr="23" g="0,0,80,40" var="RELEASE_FLAG"/>
+          <script expr="N" g="0,0,80,40" var="RELEASEINMID_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+         <script expr="23" g="0,0,80,40" var="RELEASE_FLAG"/>
+          <script expr="N" g="0,0,80,40" var="RELEASEINMID_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+         <script expr="23" g="0,0,80,40" var="RELEASE_FLAG"/>
+          <script expr="N" g="0,0,80,40" var="RELEASEINMID_FLAG"/>
+      </transition>
+      <transition g="1577,1092;1585,1105:-5,-20" name="AutoRelease" to="Wait For 6 hours"/>
+      <transition g="-18,15" name="ContinueWorkflow" to="Check State Between Release SD and Suspension">
+         <timer duedate="6 hours"/>
+           <script expr="N" g="0,0,80,40" var="AUTORELEASE_FLAG"/>
+      </transition>
+   </state>
+   <decision g="480,215,155,48" name="Check Workflow Type">
+      <transition g="-5,-20" name="IXC_Entry" to="Wait For Migration">
+         <condition expr="${WORKFLOW_TYPE==&apos;M&apos;}"/>
+      </transition>
+      <transition g="-5,-20" name="IXC_Entry" to="Early Entry Action">
+         <condition expr="${WORKFLOW_TYPE==&apos;N&apos;}"/>
+      </transition>
+   </decision>
+    <state continue="async" g="670,213,150,52" name="Wait For Migration">
+      <transition g="-5,-20" name="MigComplete" to="Check Diferent State For Migration">
+      <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+      <transition g="5,-9" name="ContinueWorkflow" to="Update Workflow Type"/>
+   </state>
+   <decision g="952,215,230,48" name="Check Diferent State For Migration">
+    <transition to="Collection Final Strategy">
+         <condition expr="${IXC_STEP==&apos;Writeoff&apos;}"/>
+      </transition>
+      <transition to="Collection Final Strategy">
+         <condition expr="${IXC_STEP==&apos;Deactivation&apos;}"/>
+      </transition>
+      <transition to="Collection Final Strategy">
+         <condition expr="${IXC_STEP==&apos;Suspension&apos; &amp;&amp; IXC_SUB_STEP!=&apos;WBFS&apos;}"/>
+      </transition>
+      <transition g="140,1892:" to="Wait 14 Days Before Final Strategy">
+         <condition expr="${IXC_STEP==&apos;Suspension&apos; &amp;&amp; IXC_SUB_STEP==&apos;WBFS&apos;}"/>
+      </transition>
+      <transition to="Payment Plan SubWF">
+         <condition expr="${IXC_STEP==&apos;PaymentPlan&apos;}"/>
+            <script expr="3" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition to="Promise To Pay SubWF">
+         <condition expr="${IXC_STEP==&apos;P2P&apos;}"/>
+            <script expr="3" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition to="Tickler For Hold Entry">
+         <condition expr="${IXC_STEP==&apos;Hold&apos;}"/>
+            <script expr="3" g="0,0,80,40" var="HOLD_FLAG"/>
+            <script expr="Hold_M" g="0,0,80,40" var="IXC_STEP"/>
+      </transition>
+      <transition to="05-OD-02-PC25">
+         <condition expr="${IXC_STEP==&apos;05-OD-02-PC25&apos;}"/>
+      </transition>
+      <transition to="INVALID CUSTOMER STATE">
+         <condition expr="${IXC_STEP==&apos;Invalid&apos; || IXC_STEP==&apos;Invalid_PP&apos; || IXC_STEP==&apos;Invalid_INS&apos; || IXC_STEP==&apos;Invalid_PAY&apos;}"/>
+      </transition>
+      <transition to="Early Entry Action">
+         <condition expr="${IXC_STEP==&apos;FirstStep&apos;}"/>
+      </transition>
+   </decision>
+   <custom g="156,3483,170,52" name="INVALID CUSTOMER STATE" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="Wait to Fix Customer Data"/>
+   </custom>
+   <state continue="async" g="148,3610,185,52" name="Wait to Fix Customer Data">
+      <transition g="240,3727:-5,-20" name="IXC_Exit" to="Collection Ended"/>
+   </state>
+   <custom g="429,337,150,52" name="Early Entry Action" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="EarlyEntryAction"/>
+      </field>
+      <transition to="Early Entry Wait"/>
+   </custom>
+   <state continue="async" g="422,446,166,52" name="Early Entry Wait">
+      <transition g="-5,-20" name="ContinueWorkflow" to="PC10 - SMS16">
+         <timer duedate="0 business minute" startdate="${DUE_TIME}"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="21" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="21" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="1141,597:-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="21" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="21" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag"/>
+   </state>
+   <custom g="153,2311,170,52" name="Tickler For Hold Entry" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="TSHAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="ACTION_TYPE"/>
+               </key>
+               <value>
+                  <object expr="TICKLER"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="LDES"/>
+               </key>
+               <value>
+                  <object expr="Hold entry on IX Collection"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="SHDES"/>
+               </key>
+               <value>
+                  <object expr="IX Hold Entry"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="TICKLER_TYPE"/>
+               </key>
+               <value>
+                  <object expr="S"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="04-HOLD-01-PCHOLD"/>
+   </custom>
+   <custom g="398,2615,165,52" name="Tickler For Hold Exit" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="TSHAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="ACTION_TYPE"/>
+               </key>
+               <value>
+                  <object expr="TICKLER"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="LDES"/>
+               </key>
+               <value>
+                  <object expr="Hold exit on IX Collection"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="SHDES"/>
+               </key>
+               <value>
+                  <object expr="IX Hold Exit"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="TICKLER_TYPE"/>
+               </key>
+               <value>
+                  <object expr="S"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="05-OD-02-PC25"/>
+   </custom>
+   <custom g="243,2693,165,52" name="Tickler for Hold Exit" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="TSHAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="ACTION_TYPE"/>
+               </key>
+               <value>
+                  <object expr="TICKLER"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="LDES"/>
+               </key>
+               <value>
+                  <object expr="Hold exit on IX Collection"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="SHDES"/>
+               </key>
+               <value>
+                  <object expr="IX Hold Exit"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="TICKLER_TYPE"/>
+               </key>
+               <value>
+                  <object expr="S"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="05-OD-03-PC47"/>
+   </custom>
+   <custom g="1889,1535,175,52" name="Set Roaming Report flag" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="UpdateWorkflowAttributeAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_PUB"/>
+               </key>
+               <value>
+                  <object expr="ROAMING_REPORT_FLAG"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_TYPE"/>
+               </key>
+               <value>
+                  <object expr="V"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_VALUE"/>
+               </key>
+               <value>
+                  <object expr="N"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="05-OD-03-PC47"/>
+   </custom>
+   <custom g="2296,1619,125,52" name="Set OOPS flag" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="UpdateWorkflowAttributeAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_PUB"/>
+               </key>
+               <value>
+                  <object expr="OOPS_FLAG"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_TYPE"/>
+               </key>
+               <value>
+                  <object expr="V"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_VALUE"/>
+               </key>
+               <value>
+                  <object expr="N"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="05-OD-03-PC47"/>
+   </custom>
+   <custom g="803,1679,155,52" name="Tickler For PC40 SD" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="TSHAction"/>
+      </field>
+      <transition to="Wait Before SMS PC46">
+        <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </custom>
+   <custom g="779,3295,205,52" name="Tickler For PC55 - Suspension" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="TSHAction"/>
+      </field>
+      <transition to="Wait 14 Days Before Final Strategy">
+        <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </custom>
+   <state continue="async" g="1189,3702,200,52" name="Wait For 12 hours Before Exit">
+      <transition g="-57,-19" name="ContinueWorkflow" to="Collection Ended">
+         <timer duedate="12 hours" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+      <transition g="1318,3661;1332,3675:-5,-20" name="InvoiceBalance" to="Wait For 12 hours Before Exit"/>
+      <transition g="1202,3675;1196,3687:-5,-20" name="AutoRelease" to="Wait For 12 hours Before Exit"/>
+      <transition g="1375,3670;1389,3685:-5,-20" name="Payment" to="Wait For 12 hours Before Exit"/>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag"/>
+      <transition g="-5,-20" name="Invoice" to="Check Exit criteria"/>
+   </state>
+   <state continue="async" g="1803,2722,355,52" name="Provisioning Wait Between Release Suspension and Release SD">
+      <transition g="-5,-20" name="ContinueWorkflow" to="Release SD1">
+       <script expr="N" g="0,0,80,40" var="AUTORELEASE_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+			<script expr="Y" g="0,0,80,40" var="RELEASEINMID_FLAG"/>
+			 <script expr="N" g="0,0,80,40" var="AUTORELEASE_FLAG"/>
+		</transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="Y" g="0,0,80,40" var="RELEASEINMID_FLAG"/>
+    </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+       <script expr="Y" g="0,0,80,40" var="RELEASEINMID_FLAG"/>
+    </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="Y" g="0,0,80,40" var="RELEASEINMID_FLAG"/>
+    </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag">
+       <script expr="N" g="0,0,80,40" var="AUTORELEASE_FLAG"/>
+     </transition>
+   </state>
+   <decision g="2405,1474,295,48" name="Check OOPS or Roaming Report Flag in OOPS State">
+      <transition g="2429,1569;2336,1569:-5,-20" name="No" to="02-OOPS-10-VIPOOPS">
+         <condition expr="${ROAMING_REPORT_FLAG!=&apos;Y&apos;}"/>
+      </transition>
+      <transition g="2429,1362:-5,-20" name="Yes" to="Set OOPS Flag IMPT">
+         <condition expr="${ROAMING_REPORT_FLAG==&apos;Y&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="102,1452,215,48" name="Check for Intermediate P2P Flag">
+      <transition g="188,1507:" to="Select PTP_FLAG For Different State">
+         <condition expr="${PTP_FLAG_I==&apos;N&apos;}"/>
+      </transition>
+      <transition g="126,1683:" to="03-BP-01-PCBP1">
+         <condition expr="${PTP_FLAG_I==&apos;Y&apos;}"/>
+           <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+   </decision>
+   <custom g="665,336,160,52" name="Update Workflow Type" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="UpdateWorkflowAttributeAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_PUB"/>
+               </key>
+               <value>
+                  <object expr="WORKFLOW_TYPE"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_TYPE"/>
+               </key>
+               <value>
+                  <object expr="V"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_VALUE"/>
+               </key>
+               <value>
+                  <object expr="N"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Early Entry Action"/>
+   </custom>
+   <custom g="1894,1654,185,52" name="Reset Roaming Report Flag" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="UpdateWorkflowAttributeAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_PUB"/>
+               </key>
+               <value>
+                  <object expr="ROAMING_REPORT_FLAG"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_TYPE"/>
+               </key>
+               <value>
+                  <object expr="V"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_VALUE"/>
+               </key>
+               <value>
+                  <object expr="N"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Check Different Events RRPT"/>
+   </custom>
+   <decision g="1964,1756,195,48" name="Check Different Events RRPT">
+      <transition to="Promise To Pay SubWF">
+         <condition expr="${SETRRPT_FLAG==&apos;1&apos;}"/>
+      </transition>
+      <transition to="Payment Plan SubWF">
+         <condition expr="${SETRRPT_FLAG==&apos;2&apos;}"/>
+      </transition>
+      <transition to="Tickler For Hold Entry">
+         <condition expr="${SETRRPT_FLAG==&apos;3&apos;}"/>
+      </transition>
+      <transition to="PC40 - SD">
+         <condition expr="${SETRRPT_FLAG==&apos;4&apos;}"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition to="IN Deduction">
+         <condition expr="${SETRRPT_FLAG==&apos;5&apos;}"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+   </decision>
+   <custom g="2190,1702,166,52" name="Reset OOPS Flag" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="UpdateWorkflowAttributeAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_PUB"/>
+               </key>
+               <value>
+                  <object expr="OOPS_FLAG"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_TYPE"/>
+               </key>
+               <value>
+                  <object expr="V"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WORKFLOW_ATTR_VALUE"/>
+               </key>
+               <value>
+                  <object expr="N"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Check Different Events OOPS"/>
+   </custom>
+   <decision g="2248,1794,195,48" name="Check Different Events OOPS">
+   <transition to="Promise To Pay SubWF">
+         <condition expr="${SETOOPS_FLAG==&apos;1&apos;}"/>
+      </transition>
+      <transition to="Payment Plan SubWF">
+         <condition expr="${SETOOPS_FLAG==&apos;2&apos;}"/>
+      </transition>
+      <transition to="Tickler For Hold Entry">
+         <condition expr="${SETOOPS_FLAG==&apos;3&apos;}"/>
+      </transition>
+      <transition to="PC40 - SD">
+         <condition expr="${SETOOPS_FLAG==&apos;4&apos;}"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition to="IN Deduction">
+         <condition expr="${SETOOPS_FLAG==&apos;5&apos;}"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+   </decision>
+   <state continue="async" g="765,1567,230,52" name="Provisioning Wait Forever After SD">
+      <transition g="-5,-20" name="ContinueWorkflow" to="Tickler For PC40 SD"/>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+         <script expr="5" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+      <script expr="5" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag"/>
+      <transition g="-5,-20" name="Hold" to="Tickler For Hold Entry"/>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="42" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="42" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+        <script expr="42" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="42" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+   </state>
+   <state continue="async" g="745,3161,270,52" name="Provisioning Wait Forever After Suspension">
+      <transition g="-5,-20" name="ContinueWorkflow" to="Tickler For PC55 - Suspension"/>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+         <script expr="11" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+      <script expr="11" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag"/>
+      <transition g="-5,-20" name="Hold" to="Tickler For Hold Entry"/>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+        <script expr="43" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+         <script expr="43" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+         <script expr="43" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+        <script expr="43" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+   </state>
+   <decision g="1751,2969,180,48" name="Check Wait After Release">
+      <transition to="Provisioning Wait Forever After Release">
+         <condition expr="${RELEASE_FLAG!=&apos;22&apos; &amp;&amp; RELEASE_FLAG!=&apos;23&apos;}"/>
+      </transition>
+      <transition to="Provisioning Wait Forever After Release1">
+         <condition expr="${RELEASE_FLAG==&apos;22&apos; || RELEASE_FLAG==&apos;23&apos;}"/>
+      </transition>
+   </decision>
+   <state continue="async" g="1590,3133,255,52" name="Provisioning Wait Forever After Release">
+      <transition g="-22,12" name="ContinueWorkflow" to="Select State After Release"/>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+      <script expr="${RELEASE_FLAG}" g="0,0,80,40" var="PTP_FLAG"/>
+    </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+      <script expr="${RELEASE_FLAG}" g="0,0,80,40" var="PTP_FLAG"/>
+    </transition>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag"/>
+      <transition g="-5,-20" name="Hold" to="Tickler For Hold Entry"/>
+    <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+      <script expr="44" g="0,0,80,40" var="PAYNINV_FLAG"/>
+    </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+      <script expr="44" g="0,0,80,40" var="PAYNINV_FLAG"/>
+    </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+      <script expr="44" g="0,0,80,40" var="PAYNINV_FLAG"/>
+    </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+      <script expr="44" g="0,0,80,40" var="PAYNINV_FLAG"/>
+    </transition>
+   </state>
+   <state continue="async" g="1968,3120,260,52" name="Provisioning Wait Forever After Release1">
+      <transition g="-134,-38" name="ContinueWorkflow" to="Select State After Release"/>
+      <transition g="-5,-20" name="IMPT" to="Check OOPS or Roaming Report Flag"/>
+      <transition g="-5,-20" name="AutoRelease" to="Wait for AutoRelease Max Scheduled Time">
+      	<script expr="45" g="0,0,80,40" var="PAYNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check IMPT Rule">
+        <script expr="Y" g="0,0,80,40" var="AUTORELEASE_FLAG"/>
+        <script expr="45" g="0,0,80,40" var="PAYNINV_FLAG"/>
+    </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check IMPT Rule">
+       <script expr="Y" g="0,0,80,40" var="AUTORELEASE_FLAG"/>
+       <script expr="45" g="0,0,80,40" var="PAYNINV_FLAG"/>
+    </transition>
+      <transition g="-5,-20" name="Invoice" to="Check IMPT Rule">
+       <script expr="Y" g="0,0,80,40" var="AUTORELEASE_FLAG"/>
+       <script expr="45" g="0,0,80,40" var="PAYNINV_FLAG"/>
+    </transition>
+   </state>
+   <decision g="1429,980,285,48" name="Check State Between Release SD and Suspension">
+      <transition to="Select State After Payment">
+         <condition expr="${RELEASEINMID_FLAG==&apos;N&apos;}"/>
+      </transition>
+      <transition to="Provisioning Wait Between Release Suspension and Release SD">
+         <condition expr="${RELEASEINMID_FLAG==&apos;Y&apos;}"/>
+           <script expr="N" g="0,0,80,40" var="RELEASEINMID_FLAG"/>
+      </transition>
+   </decision>
+   <decision g="1175,3513,155,48" name="Check Exit criteria">
+      <transition g="1198,3633:-5,-20" name="Yes" to="Wait For 12 hours Before Exit">
+         <condition expr="${CUSTOMER_AMOUNT&lt;25}"/>
+      </transition>
+      <transition g="-5,-20" name="No" to="Early Entry Action">
+         <condition expr="${CUSTOMER_AMOUNT&gt;=25}"/>
+      </transition>
+   </decision>
+   <decision g="773,2827,155,48" name="Check In Flag Value">
+      <transition g="879,2851:" to="Provisioning Wait for IN Deduction Max. Wait Period">
+         <condition expr="${IN_FLAG==&apos;T&apos;}"/>
+      </transition>
+      <transition g="797,2986:" to="PC55 - Suspension">
+         <condition expr="${IN_FLAG==&apos;F&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="1049,20,115,48" name="CheckAmount">
+   <transition g="-5,-20" name="Yes" to="Collection Started">
+         <condition expr="${CUSTOMER_AMOUNT &gt;= 25}"/>
+      </transition>
+      <transition g="-5,-20" name="No" to="Wait For 12 hours Before Exit">
+         <condition expr="${CUSTOMER_AMOUNT &lt; 25}"/>
+      </transition>
+   </decision>
+   <decision g="792,5,180,48" name="Check for Entry Criteria">
+   <handler class="com.mobinil.decision.handler.EntryCriteriaValidator"/>
+    <transition g="-12,-20" name="T" to="CheckAmount"/>
+       <transition g="-11,-20" name="F" to="Wait For 12 hours Before Exit"/>
+   </decision>
+   <decision name="Check Provisioning Wait Flag" g="1673,1068,200,48">
+      <transition to="Wait For 6 hours">
+         <condition expr="${PAYNINV_FLAG!=&apos;45&apos;}"/>
+      </transition>
+      <transition to="Check State Between Release SD and Suspension">
+         <condition expr="${PAYNINV_FLAG==&apos;45&apos;}"/>
+      </transition>
+   </decision>
+</process>

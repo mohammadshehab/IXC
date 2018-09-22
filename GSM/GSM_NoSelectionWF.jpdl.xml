@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler" name="GSM_NoSelectionWF" xmlns="http://jbpm.org/4.0/jpdl">
+   <start continue="async" g="473,0,48,48" name="start1">
+      <transition to="Check for Entry Criteria"/>
+   </start>
+   <decision g="466,133,155,48" name="Customer Type Check">
+      <handler class="com.mobinil.decision.handler.CustCodeValidator"/>
+      <transition g="225,157:-11,-20" name="F" to="NoSelectionWF-Corporate"/>
+      <transition g="772,157:-110,3" name="T" to="NoSelectionWF-Consumer"/>
+   </decision>
+   <custom g="138,264,175,52" name="NoSelectionWF-Corporate" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition g="225,387:" to="Wait Forever"/>
+   </custom>
+   <custom g="688,257,170,52" name="NoSelectionWF-Consumer" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition g="773,387:" to="Wait Forever"/>
+   </custom>
+   <state continue="async" g="430,361,162,52" name="Wait Forever">
+      <transition g="404,431;445,436:-5,-20" name="AutoRelease" to="Wait Forever"/>
+      <transition g="641,417;613,424:-5,-20" name="IMPT" to="Wait Forever"/>
+      <transition g="555,333;574,347:-5,-20" name="InvoiceBalance" to="Wait Forever"/>
+      <transition g="484,321;511,330:-5,-20" name="Invoice" to="Wait Forever"/>
+      <transition g="435,324;416,348:-5,-20" name="Payment" to="Wait Forever"/>
+      <transition g="603,435;573,437:-55,-8" name="ContinueWorkflow" to="Wait Forever"/>
+      <transition g="1,4" name="IXC_Exit" to="Collection Ended"/>
+   </state>
+   <end g="488,575,48,48" name="end1"/>
+   <custom g="441,477,140,52" name="Collection Ended" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ImportInterfaceAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="ACTIVITY_TYPE"/>
+               </key>
+               <value>
+                  <object expr="CollectionEnded"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="IXC_UPDATE"/>
+               </key>
+               <value>
+                  <object expr="Y"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="end1"/>
+   </custom>
+   <decision g="645,12,180,48" name="Check for Entry Criteria">
+     <handler class="com.mobinil.decision.handler.EntryCriteriaValidator"/>
+     <transition g="20,-6" name="T" to="CheckAmount"/>
+       <transition g="-11,-20" name="F" to="Wait For 12 hours Before Exit"/>
+   </decision>
+   <state continue="async" g="661,101,205,52" name="Wait For 12 hours Before Exit">
+      <transition g="-5,-20" name="ContinueWorkflow" to="Collection Ended">
+         <timer duedate="12 hours" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+   </state>
+   <decision g="352,60,115,48" name="CheckAmount">
+   <transition g="-5,-20" name="Yes" to="Customer Type Check">
+         <condition expr="${CUSTOMER_AMOUNT &gt;= 15}"/>
+      </transition>
+   <transition g="-11,-20" name="No" to="Wait For 12 hours Before Exit">
+         <condition expr="${CUSTOMER_AMOUNT &lt; 15}"/>
+      </transition>
+   </decision>
+</process>

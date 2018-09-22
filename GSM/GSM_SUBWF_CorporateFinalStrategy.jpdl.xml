@@ -1,0 +1,2224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler" name="GSM_SUBWF_CorporateFinalStrategy" xmlns="http://jbpm.org/4.0/jpdl">
+   <start continue="async" g="1057,-9,48,48" name="start1">
+      <transition to="FS60-FinalStrategy Entry">
+      <script expr="12 hours" g="0,0,80,40" var="AUTOTIME"/>
+      <script expr="N" g="0,0,80,40" var="COMMISSION_FLAG"/>
+        <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+   </start>
+   <state continue="async" g="998,308,165,52" name="FS69-Corp-Coll-letter_WAIT">
+      <transition g="4,-20" name="ContinueWorkflow" to="Check Corporate Category">
+         <timer duedate="${30-SUSPENSION_DAYS} business days" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="29" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="29" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="29" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="29" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="29" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="29" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="29" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check Open Amount After Payment">
+         <script expr="29" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check Open Amount After Payment">
+         <script expr="29" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IXC_Exit" to="Agency Assignment Check Before Exit"/>
+      <transition g="1035,283;1013,294:-5,-20" name="AutoRelease" to="FS69-Corp-Coll-letter_WAIT"/>
+      <transition g="1140,284;1147,296:-5,-20" name="IMPT" to="FS69-Corp-Coll-letter_WAIT"/>
+   </state>
+   <decision g="1056,406,180,48" name="Check Corporate Category">
+      <transition g="-5,-20" name="Yes" to="Automatic Assign To Mobinil Agency">
+         <condition expr="${(CSLEVEL==&quot;10&quot; || CSLEVEL==&quot;20&quot; || CSLEVEL==&quot;30&quot;) &amp;&amp; (CORPORATE_CATEGORY==&quot;Large&quot; || CORPORATE_CATEGORY==&quot;Key&quot; || CORPORATE_CATEGORY==&quot;ME&quot; || CORPORATE_CATEGORY==&quot;SE&quot; || CORPORATE_CATEGORY==&quot;Micro&quot; || CORPORATE_CATEGORY==&quot;B2B2C&quot;)}"/>
+      </transition>
+       <transition g="-5,-20" name="No" to="Check Cslevel And Payment Responsible">
+      </transition>
+   </decision>
+   <state continue="async" g="979,827,202,52" name="FS74-AgencyAllo-Corp_WAIT">
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="30" g="0,0,80,40" var="PTP_FLAG"/>
+           <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="30" g="0,0,80,40" var="PTP_FLAG"/>
+           <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="30" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="30" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="30" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="30" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="30" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SelectCollectionAgency" to="Finish Collection Agency">
+        <script expr="30" g="0,0,80,40" var="AGENCY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Handle WriteOff Action">
+         <script expr="30" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Handle WriteOff Action">
+         <script expr="30" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IXC_Exit" to="Agency Assignment Check Before Exit"/>
+      <transition g="1131,804;1146,814:-5,-20" name="AutoRelease" to="FS74-AgencyAllo-Corp_WAIT"/>
+      <transition g="1037,799;1031,810:-5,-20" name="Feedback" to="FS74-AgencyAllo-Corp_WAIT"/>
+      <transition g="1168,806;1171,820:-5,-20" name="IMPT" to="FS74-AgencyAllo-Corp_WAIT"/>
+   </state>
+   <state continue="async" g="979,975,200,52" name="FS-104-Corp-SUSP_WAIT">
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="31" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="31" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="31" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="31" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="31" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SelectCollectionAgency" to="Finish Collection Agency">
+         <script expr="31" g="0,0,80,40" var="AGENCY_FLAG"/>
+      </transition>
+      <transition g="1115,944;1128,964:-5,-20" name="Feedback" to="FS-104-Corp-SUSP_WAIT"/>
+      <transition g="-5,-20" name="Payment" to="HandleWriteOffAction">
+         <script expr="31" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="HandleWriteOffAction">
+         <script expr="31" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="31" g="0,0,80,40" var="PTP_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="31" g="0,0,80,40" var="PTP_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IXC_Exit" to="Agency Assignment Check Before Exit"/>
+      <transition g="1039,948;1022,958:-5,-20" name="AutoRelease" to="FS-104-Corp-SUSP_WAIT"/>
+      <transition g="1078,1056:8,-17" name="ContinueWorkflow" to="FS-204-Corp-Deact">
+         <timer duedate="${30-SUSPENSION_DAYS} business days" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+      <transition g="1157,954;1161,968:-5,-20" name="IMPT" to="FS-104-Corp-SUSP_WAIT"/>
+   </state>
+   <decision g="1697,406,245,48" name="Check Cslevel And Payment Responsible">
+      <transition g="-5,-20" name="Yes" to="Automatic Assign To Mobinil Agency1">
+         <condition expr="${CSLEVEL==&apos;40&apos; &amp;&amp; PAYMENT_RESP==&apos;X&apos;}"/>
+      </transition>
+      <transition g="-5,-20" name="No" to="FS76-Exclude-SUSP">
+         <condition expr="${CSLEVEL!=&apos;40&apos; || PAYMENT_RESP!=&apos;X&apos;}"/>
+      </transition>
+   </decision>
+   <state continue="async" g="2263,405,207,52" name="FS76-Exclude-SUSP_WAIT">
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="40" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="40" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="40" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="40" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="40" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="40" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="40" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check Open Amount After Payment">
+         <script expr="40" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check Open Amount After Payment">
+         <script expr="40" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="1,-17" name="SelectCollectionAgency" to="Assignment to Collection Agency FS76">
+      </transition>
+      <transition g="-5,-20" name="IXC_Exit" to="Agency Assignment Check Before Exit"/>
+      <transition g="2414,372;2426,387:-5,-20" name="AutoRelease" to="FS76-Exclude-SUSP_WAIT"/>
+      <transition g="2384,366;2397,378:-5,-20" name="IMPT" to="FS76-Exclude-SUSP_WAIT"/>
+   </state>
+   <state continue="async" g="1626,826,191,52" name="FS75-AgencyAllo-IUC_WAIT">
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="35" g="0,0,80,40" var="PTP_FLAG"/>
+           <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="35" g="0,0,80,40" var="PTP_FLAG"/>
+           <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="35" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="35" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="35" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="35" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="35" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SelectCollectionAgency" to="Finish Collection Agency">
+         <script expr="35" g="0,0,80,40" var="AGENCY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Handle WriteOff Action">
+         <script expr="35" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Handle WriteOff Action">
+         <script expr="35" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IXC_Exit" to="Agency Assignment Check Before Exit"/>
+      <transition g="1765,797;1775,812:-5,-20" name="AutoRelease" to="FS75-AgencyAllo-IUC_WAIT"/>
+      <transition g="1682,795;1673,811:-5,-20" name="Feedback" to="FS75-AgencyAllo-IUC_WAIT"/>
+      <transition g="1647,806;1642,815:-5,-20" name="IMPT" to="FS75-AgencyAllo-IUC_WAIT"/>
+   </state>
+   <state continue="async" g="982,1117,195,52" name="FS-204-Corp-Deact_WAIT">
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="32" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="32" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="32" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="32" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="32" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SelectCollectionAgency" to="Finish Collection Agency">
+        <script expr="32" g="0,0,80,40" var="AGENCY_FLAG"/>
+      </transition>
+      <transition g="1047,1085;1031,1101:-5,-20" name="Feedback" to="FS-204-Corp-Deact_WAIT"/>
+      <transition g="-5,-20" name="Payment" to="HandleWriteOffAction">
+         <script expr="32" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="HandleWriteOffAction">
+         <script expr="32" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="32" g="0,0,80,40" var="PTP_FLAG"/>
+         <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="32" g="0,0,80,40" var="PTP_FLAG"/>
+         <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IXC_Exit" to="Agency Assignment Check Before Exit"/>
+      <transition g="1107,1087;1122,1098:-5,-20" name="AutoRelease" to="FS-204-Corp-Deact_WAIT"/>
+      <transition g="6,-14" name="ContinueWorkflow" to="FS304-Corp-Wrt-OFF">
+         <timer duedate="${365-DEACTIVATION_DAYS} business days" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+      <transition g="1152,1104;1148,1091:-5,-20" name="IMPT" to="FS-204-Corp-Deact_WAIT"/>
+   </state>
+   <state continue="async" g="984,1334,190,52" name="FS304-Corp-Wrt-OFF_WAIT">
+      <transition g="1144,1308;1149,1322:-5,-20" name="ContinueWorkflow" to="FS304-Corp-Wrt-OFF_WAIT"/>
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="33" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="33" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="33" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="33" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="33" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SelectCollectionAgency" to="Finish Collection Agency">
+        <script expr="33" g="0,0,80,40" var="AGENCY_FLAG"/>
+      </transition>
+      <transition g="1042,1309;1025,1321:-21,-20" name="Feedback" to="FS304-Corp-Wrt-OFF_WAIT"/>
+      <transition g="-5,-20" name="Payment" to="HandleWriteOffAction">
+         <script expr="33" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="HandleWriteOffAction">
+         <script expr="33" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="33" g="0,0,80,40" var="PTP_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="33" g="0,0,80,40" var="PTP_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IXC_Exit" to="Agency Assignment Check Before Exit"/>
+      <transition g="1111,1301;1123,1314:-5,-20" name="AutoRelease" to="FS304-Corp-Wrt-OFF_WAIT"/>
+      <transition g="-26,-13" name="WriteOff" to="HandleWriteOffAction Corp"/>
+      <transition g="1061,1299;1054,1312:-5,-20" name="IMPT" to="FS304-Corp-Wrt-OFF_WAIT"/>
+   </state>
+   <state continue="async" g="972,1456,199,52" name="FS-404-Corp-Payment_WAIT">
+      <transition g="1126,1434;1139,1442:-22,-14" name="ContinueWorkflow" to="FS-404-Corp-Payment_WAIT"/>
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="34" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="34" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="34" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="34" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="34" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SelectCollectionAgency" to="Finish Collection Agency">
+        <script expr="34" g="0,0,80,40" var="AGENCY_FLAG"/>
+      </transition>
+      <transition g="1010,1430;1003,1441:-5,-20" name="Feedback" to="FS-404-Corp-Payment_WAIT"/>
+      <transition g="-5,-20" name="Payment" to="HandleWriteOffAction">
+         <script expr="34" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="HandleWriteOffAction">
+         <script expr="34" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="34" g="0,0,80,40" var="PTP_FLAG"/>
+        <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="34" g="0,0,80,40" var="PTP_FLAG"/>
+        <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IXC_Exit" to="Agency Assignment Check Before Exit"/>
+      <transition g="1096,1425;1108,1437:-5,-20" name="AutoRelease" to="FS-404-Corp-Payment_WAIT"/>
+      <transition g="-5,-20" name="WriteOff" to="HandleWriteOffAction Corp-Payment"/>
+      <transition g="1055,1417;1039,1427:-5,-20" name="IMPT" to="FS-404-Corp-Payment_WAIT"/>
+   </state>
+   <state continue="async" g="1623,925,195,52" name="FS-105-IUC-SUSP_WAIT">
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="36" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="36" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="36" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="36" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="36" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SelectCollectionAgency" to="Finish Collection Agency">
+        <script expr="36" g="0,0,80,40" var="AGENCY_FLAG"/>
+      </transition>
+      <transition g="1783,906;1801,915:-5,-20" name="Feedback" to="FS-105-IUC-SUSP_WAIT"/>
+      <transition g="-5,-20" name="Payment" to="HandleWriteOffAction">
+         <script expr="36" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="HandleWriteOffAction">
+         <script expr="36" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="36" g="0,0,80,40" var="PTP_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="36" g="0,0,80,40" var="PTP_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IXC_Exit" to="Agency Assignment Check Before Exit"/>
+      <transition g="1682,899;1673,911:-5,-20" name="AutoRelease" to="FS-105-IUC-SUSP_WAIT"/>
+      <transition g="1720,1018:8,-15" name="ContinueWorkflow" to="FS-205-IUC-Deact">
+         <timer duedate="${30-SUSPENSION_DAYS} business days" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+      <transition g="1747,896;1759,904:-5,-20" name="IMPT" to="FS-105-IUC-SUSP_WAIT"/>
+   </state>
+   <state continue="async" g="1626,1335,191,52" name="FS305-IUC-Wrt-OFF_WAIT">
+      <transition g="1784,1313;1797,1321:-60,-16" name="ContinueWorkflow" to="FS305-IUC-Wrt-OFF_WAIT"/>
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="38" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="38" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="38" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="38" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="38" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SelectCollectionAgency" to="Finish Collection Agency">
+        <script expr="38" g="0,0,80,40" var="AGENCY_FLAG"/>
+      </transition>
+      <transition g="1666,1307;1661,1317:-5,-20" name="Feedback" to="FS305-IUC-Wrt-OFF_WAIT"/>
+      <transition g="-5,-20" name="Payment" to="HandleWriteOffAction">
+         <script expr="38" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="HandleWriteOffAction">
+         <script expr="38" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="38" g="0,0,80,40" var="PTP_FLAG"/>
+         <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="38" g="0,0,80,40" var="PTP_FLAG"/>
+         <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IXC_Exit" to="Agency Assignment Check Before Exit"/>
+      <transition g="1691,1300;1679,1313:-5,-20" name="AutoRelease" to="FS305-IUC-Wrt-OFF_WAIT"/>
+      <transition g="-18,-20" name="WriteOff" to="HandleWriteOffAction IUC"/>
+      <transition g="1753,1304;1761,1318:-5,-20" name="IMPT" to="FS305-IUC-Wrt-OFF_WAIT"/>
+   </state>
+   <state continue="async" g="1619,1452,192,52" name="FS-405-IUC-Payment_WAIT">
+      <transition g="1756,1430;1769,1439:-5,-20" name="ContinueWorkflow" to="FS-405-IUC-Payment_WAIT"/>
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="39" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="39" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="39" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="39" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="39" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SelectCollectionAgency" to="Finish Collection Agency">
+        <script expr="39" g="0,0,80,40" var="AGENCY_FLAG"/>
+      </transition>
+      <transition g="1663,1426;1654,1435:-5,-20" name="Feedback" to="FS-405-IUC-Payment_WAIT"/>
+      <transition g="-5,-20" name="Payment" to="HandleWriteOffAction">
+         <script expr="39" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="HandleWriteOffAction">
+         <script expr="39" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="39" g="0,0,80,40" var="PTP_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="39" g="0,0,80,40" var="PTP_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IXC_Exit" to="Agency Assignment Check Before Exit"/>
+      <transition g="1730,1418;1744,1433:-5,-20" name="AutoRelease" to="FS-405-IUC-Payment_WAIT"/>
+      <transition g="-5,-6" name="WriteOff" to="HandleWriteOffAction IUC-Payment"/>
+      <transition g="1694,1420;1685,1434:-5,-20" name="IMPT" to="FS-405-IUC-Payment_WAIT"/>
+   </state>
+   <state continue="async" g="1621,1116,202,52" name="FS-205-IUC-Deact_WAIT">
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="37" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="37" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="37" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="37" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="37" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SelectCollectionAgency" to="Finish Collection Agency">
+        <script expr="37" g="0,0,80,40" var="AGENCY_FLAG"/>
+      </transition>
+      <transition g="1760,1087;1783,1097:-5,-20" name="Feedback" to="FS-205-IUC-Deact_WAIT"/>
+      <transition g="-5,-20" name="Payment" to="HandleWriteOffAction">
+         <script expr="37" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="HandleWriteOffAction">
+         <script expr="37" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="37" g="0,0,80,40" var="PTP_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="37" g="0,0,80,40" var="PTP_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="IXC_Exit" to="Agency Assignment Check Before Exit"/>
+      <transition g="1672,1090;1662,1100:-5,-20" name="AutoRelease" to="FS-205-IUC-Deact_WAIT"/>
+      <transition g="2,-11" name="ContinueWorkflow" to="FS305-IUC-Wrt-OFF">
+         <timer duedate="${365-DEACTIVATION_DAYS} business days" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+      <transition g="1730,1079;1743,1091:-5,-20" name="IMPT" to="FS-205-IUC-Deact_WAIT"/>
+   </state>
+   <state continue="async" g="2267,921,200,52" name="Deact-Exc-corporate_WAIT">
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="41" g="0,0,80,40" var="PTP_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="41" g="0,0,80,40" var="PTP_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="41" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="41" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="41" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="41" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="41" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="8,-19" name="IXC_Exit" to="Agency Assignment Check Before Exit"/>
+      <transition g="-5,-20" name="Payment" to="Check PTP Flag For Commission Calculation">
+         <script expr="41" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check PTP Flag For Commission Calculation">
+         <script expr="41" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="2418,896;2428,907:-5,-20" name="AutoRelease" to="Deact-Exc-corporate_WAIT"/>
+      <transition g="2316,895;2308,906:-5,-20" name="IMPT" to="Deact-Exc-corporate_WAIT"/>
+   </state>
+   <end g="3653,2353,100,48" name="IXC_Exit"/>
+   <sub-process g="2509,1653,215,52" name="Promise To Pay SubWF" sub-process-key="GSM_SUBWF_PromiseStrategy">
+   		  <parameter-out subvar="BP_ACTION_I" var="BP_ACTION_I"/>
+      <transition g="2668,1817:-14,-24" name="CancelPromise" to="Check for Intermediate P2P Flag"/>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="2894,1847:-5,-20" name="BrokenPromise" to="03-BP-06-FS03">
+        <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+      <transition g="2658,1841:-5,-20" name="P2PSetupFailed" to="Check for Intermediate P2P Flag"/>
+      <transition g="-5,-20" name="KeptPromise" to="Check for Intermediate P2P Flag After Kept Promise"/>
+   </sub-process>
+   <sub-process g="3081,1670,205,52" name="Payment Plan SubWF" sub-process-key="GSM_SUBWF_PaymentPlanSubWF">
+      <transition g="3235,1816:-5,-20" name="CancelPaymentPlan" to="Check for Intermediate P2P Flag"/>
+      <transition g="2982,1928:-5,-20" name="BrokenPromise" to="03-BP-06-FS03">
+        <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+      <transition g="3252,1799:-5,-20" name="PPSetupFailed" to="Check for Intermediate P2P Flag"/>
+      <transition g="-5,-20" name="KeptPromise" to="Check for Intermediate P2P Flag After Kept Promise"/>
+   </sub-process>
+   <decision g="3159,2108,310,48" name="Check Open Amount After Kept Promise For Corporate">
+      <transition g="-5,-20" name="No" to="Select PTP_FLAG For Different State For Corporate">
+         <condition expr="${CUSTOMER_AMOUNT&gt;0}"/>
+      </transition>
+      <transition g="-5,-20" name="Yes" to="Wait For 12 hours Before Exit">
+         <condition expr="${CUSTOMER_AMOUNT&lt;=0}"/>
+         <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </decision>
+   <decision g="2871,2108,305,48" name="Select PTP_FLAG For Different State For Corporate">
+      <transition to="FS69-Corp-Coll-letter_WAIT">
+         <condition expr="${PTP_FLAG==&apos;29&apos;}"/>
+      </transition>
+      <transition to="FS74-AgencyAllo-Corp_WAIT">
+         <condition expr="${PTP_FLAG==&apos;30&apos;}"/>
+      </transition>
+      <transition to="FS-104-Corp-SUSP_WAIT">
+         <condition expr="${PTP_FLAG==&apos;31&apos;}"/>
+      </transition>
+      <transition to="FS-204-Corp-Deact_WAIT">
+         <condition expr="${PTP_FLAG==&apos;32&apos;}"/>
+      </transition>
+      <transition to="FS304-Corp-Wrt-OFF_WAIT">
+         <condition expr="${PTP_FLAG==&apos;33&apos;}"/>
+      </transition>
+      <transition to="FS-404-Corp-Payment_WAIT">
+         <condition expr="${PTP_FLAG==&apos;34&apos;}"/>
+      </transition>
+      <transition to="FS75-AgencyAllo-IUC_WAIT">
+         <condition expr="${PTP_FLAG==&apos;35&apos;}"/>
+      </transition>
+      <transition to="FS-105-IUC-SUSP_WAIT">
+         <condition expr="${PTP_FLAG==&apos;36&apos;}"/>
+      </transition>
+      <transition to="FS-205-IUC-Deact_WAIT">
+         <condition expr="${PTP_FLAG==&apos;37&apos;}"/>
+      </transition>
+      <transition to="FS305-IUC-Wrt-OFF_WAIT">
+         <condition expr="${PTP_FLAG==&apos;38&apos;}"/>
+      </transition>
+      <transition to="FS-405-IUC-Payment_WAIT">
+         <condition expr="${PTP_FLAG==&apos;39&apos;}"/>
+      </transition>
+      <transition to="FS76-Exclude-SUSP_WAIT">
+         <condition expr="${PTP_FLAG==&apos;40&apos;}"/>
+      </transition>
+      <transition to="Deact-Exc-corporate_WAIT">
+         <condition expr="${PTP_FLAG==&apos;41&apos;}"/>
+      </transition>
+   </decision>
+   <task continue="async" g="2797,1963,196,52" name="03-BP-06-FS03">
+      <assignment-handler class="com.lhs.wma.wfms.jbpm4.WFMSTaskAssignment">
+         <field name="actionName">
+            <string value="03-BP-06-FS03"/>
+         </field>
+      </assignment-handler>
+      <transition g="-5,-20" name="SD" to="FS70 - SD">
+        <script expr="43" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="Suspension" to="FS75 - Suspension">
+        <script expr="43" g="0,0,80,40" var="SD_SUSP_FLAG"/>
+          <script expr="MAN" g="0,0,80,40" var="PROVISIONING_TYPE"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSD" to="Release SD">
+        <script expr="43" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSuspension" to="Release Suspension">
+        <script expr="43" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="ReleaseSDandSuspension" to="Release Suspension1">
+        <script expr="43" g="0,0,80,40" var="RELNWRNINV_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check PTP Flag For Commission Calculation">
+         <script expr="43" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check PTP Flag For Commission Calculation">
+         <script expr="43" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="Y" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+        <script expr="Y" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+      <transition g="2860,1937;2845,1950:-18,-16" name="CancelPaymentPlan" to="03-BP-06-FS03"/>
+      <transition g="2972,2034;2982,2025:-5,-20" name="AutoRelease" to="03-BP-06-FS03"/>
+      <transition g="-5,-20" name="TO_FS69_CORP_COLL_LETTER" to="FS69-Corp-Coll-letter"/>
+      <transition g="-5,-20" name="TO_DEACT_EXC_CORPORATE" to="Deact-Exc-corporate"/>
+      <transition g="2989,1931;2989,1948:-5,-20" name="IMPT" to="03-BP-06-FS03"/>
+   </task>
+   <custom g="3895,699,177,52" name="FS70 - SD" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ProvisioningRevampAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="PROVIDING_ACTION"/>
+               </key>
+               <value>
+                  <object expr="SD"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WF_STEP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Provisioning Wait"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition g="-5,-20" name="ErrorHandler" to="ActionError">
+         <script expr="1" g="0,0,80,40" var="ERROR_FLAG"/>
+      </transition>
+      <transition to="Check Wait After SD or Suspension"/>
+   </custom>
+   <custom g="3764,357,180,52" name="FS75 - Suspension" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ProvisioningRevampAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="PROVIDING_ACTION"/>
+               </key>
+               <value>
+                  <object expr="Suspension"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WF_STEP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Provisioning Wait"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition g="-5,-20" name="ErrorHandler" to="ActionError">
+         <script expr="2" g="0,0,80,40" var="ERROR_FLAG"/>
+      </transition>
+      <transition g="4153,449;4159,768:" to="Check Wait After SD or Suspension"/>
+   </custom>
+   <decision g="3961,554,220,48" name="Select State After FS70 and FS75">
+      <transition to="FS69-Corp-Coll-letter_WAIT">
+         <condition expr="${SD_SUSP_FLAG==&apos;29&apos;}"/>
+      </transition>
+      <transition to="FS74-AgencyAllo-Corp_WAIT">
+         <condition expr="${SD_SUSP_FLAG==&apos;30&apos;}"/>
+      </transition>
+      <transition to="FS-104-Corp-SUSP_WAIT">
+         <condition expr="${SD_SUSP_FLAG==&apos;31&apos;}"/>
+      </transition>
+      <transition to="FS-204-Corp-Deact_WAIT">
+         <condition expr="${SD_SUSP_FLAG==&apos;32&apos;}"/>
+      </transition>
+      <transition to="FS304-Corp-Wrt-OFF_WAIT">
+         <condition expr="${SD_SUSP_FLAG==&apos;33&apos;}"/>
+      </transition>
+      <transition to="FS-404-Corp-Payment_WAIT">
+         <condition expr="${SD_SUSP_FLAG==&apos;34&apos;}"/>
+      </transition>
+      <transition to="FS75-AgencyAllo-IUC_WAIT">
+         <condition expr="${SD_SUSP_FLAG==&apos;35&apos;}"/>
+      </transition>
+      <transition to="FS-105-IUC-SUSP_WAIT">
+         <condition expr="${SD_SUSP_FLAG==&apos;36&apos;}"/>
+      </transition>
+      <transition to="FS-205-IUC-Deact_WAIT">
+         <condition expr="${SD_SUSP_FLAG==&apos;37&apos;}"/>
+      </transition>
+      <transition to="FS305-IUC-Wrt-OFF_WAIT">
+         <condition expr="${SD_SUSP_FLAG==&apos;38&apos;}"/>
+      </transition>
+      <transition to="FS-405-IUC-Payment_WAIT">
+         <condition expr="${SD_SUSP_FLAG==&apos;39&apos;}"/>
+      </transition>
+      <transition to="FS76-Exclude-SUSP_WAIT">
+         <condition expr="${SD_SUSP_FLAG==&apos;40&apos;}"/>
+      </transition>
+      <transition to="Deact-Exc-corporate_WAIT">
+         <condition expr="${SD_SUSP_FLAG==&apos;41&apos;}"/>
+      </transition>
+      <transition to="03-BP-06-FS03">
+         <condition expr="${SD_SUSP_FLAG==&apos;43&apos;}"/>
+      </transition>
+   </decision>
+   <custom g="35,449,164,52" name="Release SD" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ProvisioningRevampAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="PROVIDING_ACTION"/>
+               </key>
+               <value>
+                  <object expr="ReleaseSD"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WF_STEP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Provisioning Wait"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition g="-5,-20" name="ErrorHandler" to="ActionError">
+         <script expr="3" g="0,0,80,40" var="ERROR_FLAG"/>
+      </transition>
+      <transition g="44,547:" to="Check Wait After Release"/>
+   </custom>
+   <custom g="97,635,195,52" name="Release Suspension" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ProvisioningRevampAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="PROVIDING_ACTION"/>
+               </key>
+               <value>
+                  <object expr="ReleaseSuspension"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WF_STEP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Provisioning Wait"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition g="-5,-20" name="ErrorHandler" to="ActionError">
+         <script expr="4" g="0,0,80,40" var="ERROR_FLAG"/>
+      </transition>
+      <transition g="44,748:" to="Check Wait After Release"/>
+   </custom>
+   <custom g="52,1013,200,52" name="Release Suspension1" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ProvisioningRevampAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="PROVIDING_ACTION"/>
+               </key>
+               <value>
+                  <object expr="ReleaseSuspension"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WF_STEP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Provisioning Wait"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition g="-5,-20" name="ErrorHandler" to="ActionError">
+         <script expr="5" g="0,0,80,40" var="ERROR_FLAG"/>
+      </transition>
+      <transition to="Provisioning Wait Between Release Suspension and Release SD"/>
+   </custom>
+   <custom g="76,1240,151,52" name="Release SD1" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="ProvisioningRevampAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="PROVIDING_ACTION"/>
+               </key>
+               <value>
+                  <object expr="ReleaseSD"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="WF_STEP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Provisioning Wait"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition g="-5,-20" name="ErrorHandler" to="ActionError">
+         <script expr="6" g="0,0,80,40" var="ERROR_FLAG"/>
+      </transition>
+      <transition g="44,1213:" to="Check Wait After Release"/>
+   </custom>
+   <decision g="93,792,270,48" name="Select State After Agency Release WriteOff">
+      <transition to="FS69-Corp-Coll-letter_WAIT">
+         <condition expr="${RELNWRNINV_FLAG==&apos;29&apos;}"/>
+      </transition>
+      <transition to="FS74-AgencyAllo-Corp_WAIT">
+         <condition expr="${RELNWRNINV_FLAG==&apos;30&apos;}"/>
+      </transition>
+      <transition to="FS-104-Corp-SUSP_WAIT">
+         <condition expr="${RELNWRNINV_FLAG==&apos;31&apos;}"/>
+      </transition>
+      <transition to="FS-204-Corp-Deact_WAIT">
+         <condition expr="${RELNWRNINV_FLAG==&apos;32&apos;}"/>
+      </transition>
+      <transition to="FS304-Corp-Wrt-OFF_WAIT">
+         <condition expr="${RELNWRNINV_FLAG==&apos;33&apos;}"/>
+      </transition>
+      <transition to="FS-404-Corp-Payment_WAIT">
+         <condition expr="${RELNWRNINV_FLAG==&apos;34&apos;}"/>
+      </transition>
+      <transition to="FS75-AgencyAllo-IUC_WAIT">
+         <condition expr="${RELNWRNINV_FLAG==&apos;35&apos;}"/>
+      </transition>
+      <transition to="FS-105-IUC-SUSP_WAIT">
+         <condition expr="${RELNWRNINV_FLAG==&apos;36&apos;}"/>
+      </transition>
+      <transition to="FS-205-IUC-Deact_WAIT">
+         <condition expr="${RELNWRNINV_FLAG==&apos;37&apos;}"/>
+      </transition>
+      <transition to="FS305-IUC-Wrt-OFF_WAIT">
+         <condition expr="${RELNWRNINV_FLAG==&apos;38&apos;}"/>
+      </transition>
+      <transition to="FS-405-IUC-Payment_WAIT">
+         <condition expr="${RELNWRNINV_FLAG==&apos;39&apos;}"/>
+      </transition>
+      <transition to="FS76-Exclude-SUSP_WAIT">
+         <condition expr="${RELNWRNINV_FLAG==&apos;40&apos;}"/>
+      </transition>
+      <transition to="Deact-Exc-corporate_WAIT">
+         <condition expr="${RELNWRNINV_FLAG==&apos;41&apos;}"/>
+      </transition>
+      <transition to="03-BP-06-FS03">
+         <condition expr="${RELNWRNINV_FLAG==&apos;43&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="4112,1486,215,48" name="Check Open Amount After Payment">
+      <transition g="-5,-20" name="No" to="Select State After Payment">
+         <condition expr="${CUSTOMER_AMOUNT&gt;0}"/>
+      </transition>
+      <transition g="-5,-20" name="IXC_Exit" to="Wait For 12 hours Before Exit">
+         <condition expr="${CUSTOMER_AMOUNT&lt;=0}"/>
+         <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </decision>
+   <custom g="958,519,245,52" name="Automatic Assign To Mobinil Agency" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignCollectionAgency"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_COMM_RULE_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="RUL_MOBINIL_0_000"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="MOBINIL"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Hand Over To Mobinil Agency"/>
+   </custom>
+   <custom g="976,619,210,52" name="Hand Over To Mobinil Agency" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CollectionAgencyHandover"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="CAD_TEMPLATE_FILE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CollectionAgencyHandover.xml"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="FS74-AgencyAllo-Corp"/>
+   </custom>
+   <custom g="1597,505,250,52" name="Automatic Assign To Mobinil Agency1" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignCollectionAgency"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_COMM_RULE_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="RUL_MOBINIL_0_000"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="MOBINIL"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Hand Over To Mobinil Agency1"/>
+   </custom>
+   <custom g="1614,607,215,52" name="Hand Over To Mobinil Agency1" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CollectionAgencyHandover"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="CAD_TEMPLATE_FILE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CollectionAgencyHandover.xml"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="FS75-AgencyAllo-IUC"/>
+   </custom>
+   <custom g="66,2038,215,52" name="Assignment to Collection Agency" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignCollectionAgency"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_COMM_RULE_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${RULE_NAME}"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${AGENCY_NAME}"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Hand Over to Collection Agency"/>
+   </custom>
+   <custom g="66,1932,215,52" name="Hand Over to Collection Agency" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CollectionAgencyHandover"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="CAD_TEMPLATE_FILE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CollectionAgencyHandover.xml"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Tickler for Collection Agency Assignment"/>
+   </custom>
+   <custom g="3601,1892,160,52" name="Calculate Commission" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CalculateCommission"/>
+      </field>
+      <transition g="3879,1918:" to="Select State After Payment"/>
+   </custom>
+   <decision g="4112,1345,190,48" name="Select State After Payment">
+      <transition to="Provisioning Wait Between Release Suspension and Release SD">
+         <condition expr="${PROV_PAY_FLAG==&apos;1&apos;}"/>
+         <script expr="88" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+      <transition to="Provisioning Wait Forever">
+         <condition expr="${PROV_PAY_FLAG==&apos;2&apos;}"/>
+         <script expr="88" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+       <transition to="Provisioning Wait Forever1">
+         <condition expr="${PROV_PAY_FLAG==&apos;3&apos;}"/>
+         <script expr="88" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+       <transition to="Provisioning Wait Forever After Release">
+         <condition expr="${PROV_PAY_FLAG==&apos;4&apos;}"/>
+         <script expr="88" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+       <transition to="Provisioning Wait Forever After Release1">
+         <condition expr="${PROV_PAY_FLAG==&apos;5&apos;}"/>
+         <script expr="88" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+      <transition to="FS69-Corp-Coll-letter_WAIT">
+         <condition expr="${PAY_FLAG==&apos;29&apos;}"/>
+      </transition>
+      <transition to="FS74-AgencyAllo-Corp_WAIT">
+         <condition expr="${PAY_FLAG==&apos;30&apos;}"/>
+      </transition>
+      <transition to="FS75-AgencyAllo-IUC_WAIT">
+         <condition expr="${PAY_FLAG==&apos;35&apos;}"/>
+      </transition>
+      <transition to="FS76-Exclude-SUSP_WAIT">
+         <condition expr="${PAY_FLAG==&apos;40&apos;}"/>
+      </transition>
+      <transition to="Deact-Exc-corporate_WAIT">
+         <condition expr="${PAY_FLAG==&apos;41&apos;}"/>
+      </transition>
+      <transition to="03-BP-06-FS03">
+         <condition expr="${PAY_FLAG==&apos;43&apos;}"/>
+      </transition>
+      <transition to="ActionError Wait">
+         <condition expr="${PAY_FLAG==&apos;50&apos;}"/>
+      </transition>
+      <transition to="FS-404-Corp-Payment">
+         <condition expr="${PAY_FLAG==&apos;31&apos;|| PAY_FLAG==&apos;32&apos;|| PAY_FLAG==&apos;33&apos;|| PAY_FLAG==&apos;34&apos;}"/>
+      </transition>
+      <transition to="FS-405-IUC-Payment">
+         <condition expr="${PAY_FLAG==&apos;36&apos;|| PAY_FLAG==&apos;37&apos;|| PAY_FLAG==&apos;38&apos;|| PAY_FLAG==&apos;39&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="149,1752,240,48" name="Select State After Agency Assignment">
+      <transition to="FS-204-Corp-Deact_WAIT">
+         <condition expr="${AGENCY_FLAG==&apos;32&apos;}"/>
+      </transition>
+      <transition to="FS304-Corp-Wrt-OFF_WAIT">
+         <condition expr="${AGENCY_FLAG==&apos;33&apos;}"/>
+      </transition>
+      <transition to="FS-404-Corp-Payment_WAIT">
+         <condition expr="${AGENCY_FLAG==&apos;34&apos;}"/>
+      </transition>
+      <transition to="FS-205-IUC-Deact_WAIT">
+         <condition expr="${AGENCY_FLAG==&apos;37&apos;}"/>
+      </transition>
+      <transition to="FS305-IUC-Wrt-OFF_WAIT">
+         <condition expr="${AGENCY_FLAG==&apos;38&apos;}"/>
+      </transition>
+      <transition to="FS-405-IUC-Payment_WAIT">
+         <condition expr="${AGENCY_FLAG==&apos;39&apos;}"/>
+      </transition>
+      <transition to="FS-104-Corp-SUSP_WAIT">
+         <condition expr="${AGENCY_FLAG==&apos;31&apos;}"/>
+      </transition>
+      <transition to="FS-105-IUC-SUSP_WAIT">
+         <condition expr="${AGENCY_FLAG==&apos;36&apos;}"/>
+      </transition>
+      <transition to="FS-104-Corp-SUSP">
+         <condition expr="${AGENCY_FLAG==&apos;30&apos;}"/>
+      </transition>
+      <transition to="FS-105-IUC-SUSP">
+         <condition expr="${AGENCY_FLAG==&apos;35&apos;}"/>
+      </transition>
+   </decision>
+   <custom g="2249,660,235,52" name="Hand Over to Collection Agency FS76" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CollectionAgencyHandover"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="CAD_TEMPLATE_FILE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CollectionAgencyHandover.xml"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Tickler for Collection Agency assignment"/>
+   </custom>
+   <decision g="3657,1775,260,48" name="Check Write Off Amount and Document Code">
+      <transition g="-5,-20" name="Yes" to="Calculate Commission">
+         <condition expr="${WRITEOFF_AMT==0 &amp;&amp; DOCUMENT_CODE_I!=&apos;AdvancePayment&apos;}"/>
+      </transition>
+      <transition g="-5,-20" name="No" to="Check Write Off Amount and Document Code1">
+         <condition expr="${WRITEOFF_AMT!=0 || DOCUMENT_CODE_I==&apos;AdvancePayment&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="3787,1775,265,48" name="Check Write Off Amount and Document Code1">
+      <transition g="-5,-20" name="Yes" to="Calculate Commission">
+         <condition expr="${WRITEOFF_AMT&gt;0 &amp;&amp; DOCUMENT_CODE_I==&apos;AdvancePayment&apos;}"/>
+      </transition>
+      <transition g="-5,-20" name="No" to="Select State After Payment">
+         <condition expr="${WRITEOFF_AMT&lt;=0 || DOCUMENT_CODE_I!=&apos;AdvancePayment&apos;}"/>
+      </transition>
+   </decision>
+   <custom g="2259,549,215,52" name="Assignment to Collection Agency FS76" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignCollectionAgency"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_COMM_RULE_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${RULE_NAME}"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${AGENCY_NAME}"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Hand Over to Collection Agency FS76"/>
+   </custom>
+   <custom g="990,69,180,52" name="FS60-FinalStrategy Entry" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="Check Workflow Type At Final Strategy">
+      </transition>
+   </custom>
+   <decision g="2216,1828,215,48" name="Select State After Kept Promise">
+      <transition to="Check Open Amount After Kept Promise For Corporate">
+         <condition expr="${PTP_FLAG==&apos;29&apos; || PTP_FLAG==&apos;30&apos; || PTP_FLAG==&apos;35&apos; || PTP_FLAG==&apos;40&apos; || PTP_FLAG==&apos;41&apos;}"/>
+      </transition>
+      <transition to="FS-405-IUC-Payment">
+         <condition expr="${PTP_FLAG==&apos;36&apos; || PTP_FLAG==&apos;37&apos; || PTP_FLAG==&apos;38&apos; || PTP_FLAG==&apos;39&apos;}"/>
+      </transition>
+      <transition to="FS-404-Corp-Payment">
+         <condition expr="${PTP_FLAG==&apos;31&apos; || PTP_FLAG==&apos;32&apos; || PTP_FLAG==&apos;33&apos; || PTP_FLAG==&apos;34&apos;}"/>
+      </transition>
+   </decision>
+   <custom g="748,1997,136,52" name="ActionError" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="ActionError Wait">
+     <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </custom>
+   <state continue="async" g="994,1997,153,52" name="ActionError Wait">
+      <transition g="-5,-20" name="ContinueWorkflow" to="Select State After ActionError Wait">
+         <timer duedate="12 hours" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+      <transition g="-5,-20" name="Payment" to="Check Open Amount After Payment">
+         <script expr="50" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="InvoiceBalance" to="Check Open Amount After Payment">
+         <script expr="50" g="0,0,80,40" var="PAY_FLAG"/>
+      </transition>
+      <transition g="1026,1967;1014,1977:-5,-20" name="AutoRelease" to="ActionError Wait"/>
+      <transition g="1112,1968;1118,1982:-5,-20" name="IMPT" to="ActionError Wait"/>
+   </state>
+   <decision g="1262,1844,235,48" name="Select State After ActionError Wait">
+      <transition to="FS70 - SD">
+         <condition expr="${ERROR_FLAG==&apos;1&apos;}"/>
+      </transition>
+      <transition to="FS75 - Suspension">
+         <condition expr="${ERROR_FLAG==&apos;2&apos;}"/>
+      </transition>
+      <transition to="Release SD">
+         <condition expr="${ERROR_FLAG==&apos;3&apos;}"/>
+      </transition>
+      <transition to="Release Suspension">
+         <condition expr="${ERROR_FLAG==&apos;4&apos;}"/>
+      </transition>
+      <transition to="Release Suspension1">
+         <condition expr="${ERROR_FLAG==&apos;5&apos;}"/>
+      </transition>
+      <transition to="Release SD1">
+         <condition expr="${ERROR_FLAG==&apos;6&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="1056,156,245,48" name="Check Workflow Type At Final Strategy">
+      <transition to="Check Diferent State For Migration In Final Strategy">
+         <condition expr="${WORKFLOW_TYPE==&apos;M&apos;}"/>
+      </transition>
+      <transition to="FS69-Corp-Coll-letter">
+         <condition expr="${WORKFLOW_TYPE==&apos;N&apos;}"/>
+      </transition>
+   </decision>
+    <decision g="1338,63,320,48" name="Check Diferent State For Migration In Final Strategy">
+      <transition to="Payment Plan SubWF">
+         <condition expr="${IXC_STEP==&apos;PaymentPlan&apos;}"/>
+           <script expr="29" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition to="Promise To Pay SubWF">
+         <condition expr="${IXC_STEP==&apos;P2P&apos;}"/>
+           <script expr="29" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition to="Hold State Customer">
+         <condition expr="${IXC_STEP==&apos;Hold&apos;}"/>
+      </transition>
+      <transition to="Check IXC_SUB_STEP For DEACT">
+         <condition expr="${IXC_STEP==&apos;Deactivation&apos;}"/>
+      </transition>
+      <transition to="Check IXC_SUB_STEP For WriteOff">
+         <condition expr="${IXC_STEP==&apos;Writeoff&apos;}"/>
+      </transition>
+      <transition to="Check  IXC_SUB_STEP For Suspension">
+         <condition expr="${IXC_STEP==&apos;Suspension&apos; &amp;&amp; IXC_SUB_STEP!=&apos;WBFS&apos;}"/>
+      </transition>
+      <transition to="FS69-Corp-Coll-letter"/>
+   </decision>
+   <custom g="1277,850,240,52" name="Hand Over to Collection Agency DEACT" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CollectionAgencyHandover"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="CAD_TEMPLATE_FILE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CollectionAgencyHandover.xml"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="FS-204-Corp-Deact"/>
+   </custom>
+   <decision g="1872,337,200,48" name="Check IXC_SUB_STEP For DEACT">
+      <transition to="Assignment to Collection Agency DEACT">
+         <condition expr="${IXC_SUB_STEP==&apos;FS204&apos;}"/>
+      </transition>
+      <transition to="Assignment to Collection Agency DEACT1">
+         <condition expr="${IXC_SUB_STEP==&apos;FS205&apos;}"/>
+      </transition>
+      <transition to="Assignment to Collection Agency DEACT2">
+         <condition expr="${IXC_SUB_STEP==&apos;FSEXMD&apos;}"/>
+      </transition>
+   </decision>
+   <custom g="1847,503,255,52" name="Hand Over to Collection Agency WriteOff" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CollectionAgencyHandover"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="CAD_TEMPLATE_FILE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CollectionAgencyHandover.xml"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="FS304-Corp-Wrt-OFF"/>
+   </custom>
+   <decision g="2330,277,215,48" name="Check IXC_SUB_STEP For WriteOff">
+      <transition to="Assignment to Collection Agency WriteOff">
+         <condition expr="${IXC_SUB_STEP==&apos;FS304&apos;}"/>
+      </transition>
+      <transition to="Assignment to Collection Agency WriteOff1">
+         <condition expr="${IXC_SUB_STEP==&apos;FS305&apos;}"/>
+      </transition>
+   </decision>
+   <task continue="async" g="2651,127,155,52" name="Hold State Customer">
+      <assignment-handler class="com.lhs.wma.wfms.jbpm4.WFMSTaskAssignment">
+         <field name="actionName">
+            <string value="CallOutCustomer"/>
+         </field>
+      </assignment-handler>
+      <transition g="-5,-20" name="ContinueWorkflow" to="FS69-Corp-Coll-letter_WAIT"/>
+   </task>
+   <custom g="1236,522,245,52" name="Assignment to Collection Agency Susp1" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignCollectionAgency"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_COMM_RULE_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="RUL_MOBINIL_0_000"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="MOBINIL"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Hand Over to Collection Agency Susp1"/>
+   </custom>
+   <custom g="1232,638,240,52" name="Hand Over to Collection Agency Susp1" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CollectionAgencyHandover"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="CAD_TEMPLATE_FILE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CollectionAgencyHandover.xml"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="FS74-AgencyAllo-Corp"/>
+   </custom>
+   <decision g="2161,286,230,48" name="Check  IXC_SUB_STEP For Suspension">
+      <transition to="FS69-Corp-Coll-letter">
+         <condition expr="${IXC_SUB_STEP==&apos;FS69&apos;}"/>
+      </transition>
+      <transition to="Assignment to Collection Agency Susp1">
+         <condition expr="${IXC_SUB_STEP==&apos;FS74&apos;}"/>
+      </transition>
+      <transition to="Assignment to Collection Agency Susp2">
+         <condition expr="${IXC_SUB_STEP==&apos;FS75&apos;}"/>
+      </transition>
+      <transition to="Assignment to Collection Agency Susp3">
+         <condition expr="${IXC_SUB_STEP==&apos;FS104&apos;}"/>
+      </transition>
+      <transition to="Assignment to Collection Agency Susp4">
+         <condition expr="${IXC_SUB_STEP==&apos;FS105&apos;}"/>
+      </transition>
+      <transition to="FS76-Exclude-SUSP">
+         <condition expr="${IXC_SUB_STEP==&apos;FS76&apos;}"/>
+      </transition>
+   </decision>
+   <custom g="4080,796,215,52" name="Tickler For Provisioning Action" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="TSHAction"/>
+      </field>
+      <transition g="4114,578:" to="Select State After FS70 and FS75"/>
+   </custom>
+   <state continue="async" g="4037,1877,200,52" name="Wait For 12 hours Before Exit">
+      <transition g="4137,2099:-106,-20" name="IXC_Exit" to="Agency Assignment Check Before Exit">
+         <timer duedate="12 hours" startdate="${WAITING_ENTRY_DATE}"/>
+      </transition>
+      <transition g="4086,1846;4082,1864:-5,-20" name="Payment" to="Wait For 12 hours Before Exit"/>
+      <transition g="4040,1853;4037,1870:-5,-20" name="InvoiceBalance" to="Wait For 12 hours Before Exit"/>
+      <transition g="4207,1841;4215,1857:-27,-5" name="AutoRelease" to="Wait For 12 hours Before Exit"/>
+      <transition g="4174,1836;4181,1848:-5,-20" name="IMPT" to="Wait For 12 hours Before Exit"/>
+   </state>
+   <custom g="998,231,165,52" name="FS69-Corp-Coll-letter" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="FS69-Corp-Coll-letter_WAIT">
+      <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </custom>
+   <custom g="1001,721,160,52" name="FS74-AgencyAllo-Corp" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="FS74-AgencyAllo-Corp_WAIT"/>
+   </custom>
+   <custom g="668,1015,161,52" name="FS-104-Corp-SUSP" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="FS-104-Corp-SUSP_WAIT">
+      <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </custom>
+   <custom g="1250,1030,145,52" name="FS-204-Corp-Deact" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition g="1322,1142:" to="FS-204-Corp-Deact_WAIT">
+      <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </custom>
+   <custom g="1005,1220,150,52" name="FS304-Corp-Wrt-OFF" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="FS304-Corp-Wrt-OFF_WAIT"/>
+   </custom>
+   <custom g="1292,1457,155,52" name="FS-404-Corp-Payment" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="FS-404-Corp-Payment_WAIT"/>
+   </custom>
+   <custom g="1647,712,150,52" name="FS75-AgencyAllo-IUC" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="FS75-AgencyAllo-IUC_WAIT"/>
+   </custom>
+   <custom g="1424,981,135,52" name="FS-105-IUC-SUSP" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition g="1491,951:" to="FS-105-IUC-SUSP_WAIT">
+      <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </custom>
+   <custom g="1923,992,140,52" name="FS-205-IUC-Deact" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition g="1993,1141:" to="FS-205-IUC-Deact_WAIT">
+     <script expr="${calendar:getDate()}" g="0,0,80,40" var="WAITING_ENTRY_DATE"/>
+      </transition>
+   </custom>
+   <custom g="1649,1229,145,52" name="FS305-IUC-Wrt-OFF" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="FS305-IUC-Wrt-OFF_WAIT"/>
+   </custom>
+   <custom g="1950,1452,150,52" name="FS-405-IUC-Payment" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="FS-405-IUC-Payment_WAIT"/>
+   </custom>
+   <custom g="1968,404,145,52" name="FS76-Exclude-SUSP" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="FS76-Exclude-SUSP_WAIT"/>
+   </custom>
+   <custom g="2289,831,155,52" name="Deact-Exc-corporate" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="DoNothing"/>
+      </field>
+      <transition to="Deact-Exc-corporate_WAIT"/>
+   </custom>
+   <state continue="async" g="7,1132,290,52" name="Provisioning Wait Between Release Suspension and Release SD">
+      <transition g="-5,-20" name="ContinueWorkflow" to="Release SD1">
+      </transition>
+      <transition g="266,1259:-5,-20" name="Payment" to="Check State after Payment InvoiceBalance2">
+          <script expr="{RELNWRNINV_FLAG}" g="0,0,80,40" var="PAY_FLAG"/>
+          <script expr="1" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+      <transition g="309,1199:-5,-20" name="InvoiceBalance" to="Check State after Payment InvoiceBalance2">
+        <script expr="{RELNWRNINV_FLAG}" g="0,0,80,40" var="PAY_FLAG"/>
+        <script expr="1" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+      <transition g="98,1099;92,1114:-5,-20" name="AutoRelease" to="Provisioning Wait Between Release Suspension and Release SD"/>
+      <transition g="202,1105;212,1119:-5,-20" name="IMPT" to="Provisioning Wait Between Release Suspension and Release SD"/>
+   </state>
+   <custom g="3601,1650,160,52" name="HandleWriteOffAction" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="HandleWriteOffAction"/>
+      </field>
+      <transition to="Check Write Off Amount and Document Code"/>
+   </custom>
+   <custom g="1250,1335,185,52" name="HandleWriteOffAction Corp" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="HandleWriteOffAction"/>
+      </field>
+      <transition g="1178,1410:" to="FS304-Corp-Wrt-OFF_WAIT"/>
+   </custom>
+   <custom g="1190,1554,225,52" name="HandleWriteOffAction Corp-Payment" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="HandleWriteOffAction"/>
+      </field>
+      <transition g="1137,1548:" to="FS-404-Corp-Payment_WAIT"/>
+   </custom>
+   <custom g="1880,1335,180,52" name="HandleWriteOffAction IUC" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="HandleWriteOffAction"/>
+      </field>
+      <transition g="1855,1331:" to="FS305-IUC-Wrt-OFF_WAIT"/>
+   </custom>
+   <custom g="1605,1546,220,52" name="HandleWriteOffAction IUC-Payment" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="HandleWriteOffAction"/>
+      </field>
+      <transition g="1673,1527:" to="FS-405-IUC-Payment_WAIT"/>
+   </custom>
+   <custom g="1857,840,245,52" name="Hand Over to Collection Agency DEACT1" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CollectionAgencyHandover"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="CAD_TEMPLATE_FILE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CollectionAgencyHandover.xml"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="FS-205-IUC-Deact"/>
+   </custom>
+   <custom g="2103,612,260,52" name="Hand Over to Collection Agency WriteOff1" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CollectionAgencyHandover"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="CAD_TEMPLATE_FILE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CollectionAgencyHandover.xml"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="FS305-IUC-Wrt-OFF"/>
+   </custom>
+   <custom g="2011,694,240,52" name="Hand Over to Collection Agency Susp4" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CollectionAgencyHandover"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="CAD_TEMPLATE_FILE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CollectionAgencyHandover.xml"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="FS-105-IUC-SUSP"/>
+   </custom>
+   <custom g="641,896,240,52" name="Hand Over to Collection Agency Susp3" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CollectionAgencyHandover"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="CAD_TEMPLATE_FILE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CollectionAgencyHandover.xml"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="FS-104-Corp-SUSP"/>
+   </custom>
+   <custom g="1848,597,245,52" name="Assignment to Collection Agency Susp2" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignCollectionAgency"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_COMM_RULE_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="RUL_MOBINIL_0_000"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="MOBINIL"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Hand Over to Collection Agency Susp2"/>
+   </custom>
+   <custom g="1770,663,240,52" name="Hand Over to Collection Agency Susp2" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CollectionAgencyHandover"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="CAD_TEMPLATE_FILE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CollectionAgencyHandover.xml"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition g="1889,737:" to="FS75-AgencyAllo-IUC"/>
+   </custom>
+   <custom g="647,798,245,52" name="Assignment to Collection Agency Susp3" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignCollectionAgency"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_COMM_RULE_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${RULE_NAME}"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${AGENCY_NAME}"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Hand Over to Collection Agency Susp3"/>
+   </custom>
+   <custom g="1371,751,245,52" name="Assignment to Collection Agency DEACT" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignCollectionAgency"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_COMM_RULE_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${RULE_NAME}"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${AGENCY_NAME}"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Hand Over to Collection Agency DEACT"/>
+   </custom>
+   <custom g="2096,356,260,52" name="Assignment to Collection Agency WriteOff" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignCollectionAgency"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_COMM_RULE_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${RULE_NAME}"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${AGENCY_NAME}"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Hand Over to Collection Agency WriteOff"/>
+   </custom>
+   <custom g="2092,455,265,52" name="Assignment to Collection Agency WriteOff1" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignCollectionAgency"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_COMM_RULE_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${RULE_NAME}"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${AGENCY_NAME}"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Hand Over to Collection Agency WriteOff1"/>
+   </custom>
+   <custom g="1884,753,250,52" name="Assignment to Collection Agency DEACT1" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignCollectionAgency"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_COMM_RULE_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${RULE_NAME}"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${AGENCY_NAME}"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Hand Over to Collection Agency DEACT1"/>
+   </custom>
+   <custom g="2014,551,245,52" name="Assignment to Collection Agency Susp4" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignCollectionAgency"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_COMM_RULE_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${RULE_NAME}"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${AGENCY_NAME}"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Hand Over to Collection Agency Susp4"/>
+   </custom>
+   <custom g="84,2141,180,52" name="Finish Collection Agency" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="FinishAgencyAssignment"/>
+      </field>
+      <transition to="Assignment to Collection Agency"/>
+   </custom>
+   <decision g="3651,2075,235,48" name="Agency Assignment Check Before Exit">
+      <transition g="-5,-20" name="Yes" to="Finish Collection Agency Before Exit">
+         <condition expr="${AGENCY_NAME!=null}"/>
+      </transition>
+      <transition g="3411,2099;3411,2376:-5,-20" name="No" to="IXC_Exit">
+         <condition expr="${AGENCY_NAME==null}"/>
+      </transition>
+   </decision>
+   <custom g="3556,2202,240,52" name="Finish Collection Agency Before Exit" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="FinishAgencyAssignment"/>
+      </field>
+      <transition to="IXC_Exit"/>
+   </custom>
+   <custom g="2615,555,250,52" name="Assignment to Collection Agency DEACT2" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignCollectionAgency"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_COMM_RULE_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${RULE_NAME}"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="COLL_AGENCY_ID_PUB"/>
+               </key>
+               <value>
+                  <object expr="${AGENCY_NAME}"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Hand Over to Collection Agency DEACT2"/>
+   </custom>
+   <custom g="2617,688,245,52" name="Hand Over to Collection Agency DEACT2" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CollectionAgencyHandover"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="CAD_TEMPLATE_FILE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CollectionAgencyHandover.xml"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Deact-Exc-corporate"/>
+   </custom>
+   <decision g="3911,1589,265,48" name="Check PTP Flag For Commission Calculation">
+      <transition to="Handle WriteOff Action">
+         <condition expr="${PAY_FLAG==&apos;41&apos; || PTP_FLAG==&apos;31&apos; || PTP_FLAG==&apos;32&apos; || PTP_FLAG==&apos;33&apos; || PTP_FLAG==&apos;34&apos; || PTP_FLAG==&apos;36&apos; || PTP_FLAG==&apos;37&apos; || PTP_FLAG==&apos;38&apos; || PTP_FLAG==&apos;39&apos; || PTP_FLAG==&apos;41&apos;}"/>
+      </transition>
+      <transition to="Check Open Amount After Payment">
+         <condition expr="${PTP_FLAG==&apos;29&apos; || PTP_FLAG==&apos;30&apos; || PTP_FLAG==&apos;35&apos; || PTP_FLAG==&apos;40&apos;}"/>
+      </transition>
+   </decision>
+   <custom g="3850,1675,170,52" name="Handle WriteOff Action" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="HandleWriteOffAction"/>
+      </field>
+      <transition to="Check Write Off Amount and Document Code3"/>
+   </custom>
+   <decision g="3910,1782,265,48" name="Check Write Off Amount and Document Code3">
+      <transition g="-5,-20" name="Yes" to="Calculate Commission For Agency">
+         <condition expr="${WRITEOFF_AMT==0 &amp;&amp; DOCUMENT_CODE_I!=&apos;AdvancePayment&apos;}"/>
+      </transition>
+      <transition g="-5,-20" name="No" to="Check Write Off Amount and Document Code4">
+         <condition expr="${WRITEOFF_AMT!=0 || DOCUMENT_CODE_I==&apos;AdvancePayment&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="4017,1782,265,48" name="Check Write Off Amount and Document Code4">
+      <transition g="-5,-20" name="Yes" to="Calculate Commission For Agency">
+         <condition expr="${WRITEOFF_AMT&gt;0 &amp;&amp; DOCUMENT_CODE_I==&apos;AdvancePayment&apos;}"/>
+      </transition>
+      <transition g="-5,-20" name="No" to="Check Open Amount After Payment">
+         <condition expr="${WRITEOFF_AMT&lt;=0 || DOCUMENT_CODE_I!=&apos;AdvancePayment&apos;}"/>
+      </transition>
+   </decision>
+   <custom g="3827,1937,215,52" name="Calculate Commission For Agency" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="CalculateCommission"/>
+      </field>
+      <transition to="Check Open Amount After Payment"/>
+   </custom>
+   <custom g="2236,749,260,52" name="Tickler for Collection Agency assignment" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="TSHAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="ACTION_TYPE"/>
+               </key>
+               <value>
+                  <object expr="TICKLER"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="SHDES"/>
+               </key>
+               <value>
+                  <object expr="AgencyHandling"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="TICKLER_TYPE"/>
+               </key>
+               <value>
+                  <object expr="D"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Deact-Exc-corporate"/>
+   </custom>
+   <custom g="44,1840,260,52" name="Tickler for Collection Agency Assignment" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="TSHAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="ACTION_TYPE"/>
+               </key>
+               <value>
+                  <object expr="TICKLER"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="SHDES"/>
+               </key>
+               <value>
+                  <object expr="AgencyHandling"/>
+               </value>
+            </entry>
+            <entry>
+               <key>
+                  <string value="TICKLER_TYPE"/>
+               </key>
+               <value>
+                  <object expr="D"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition to="Select State After Agency Assignment"/>
+   </custom>
+   <decision g="3169,1965,215,48" name="Check for Intermediate P2P Flag">
+      <transition to="03-BP-06-FS03">
+         <condition expr="${PTP_FLAG_I==&apos;Y&apos;}"/>
+           <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+      <transition to="Select PTP_FLAG For Different State For Corporate">
+         <condition expr="${PTP_FLAG_I==&apos;N&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="2464,2080,310,48" name="Check Open Amount After Kept Promise for Corporate">
+      <transition g="-5,-20" name="No" to="03-BP-06-FS03">
+         <condition expr="${CUSTOMER_AMOUNT&gt;0}"/>
+      </transition>
+      <transition g="3058,2196:-5,-20" name="Yes" to="Wait For 12 hours Before Exit">
+         <condition expr="${CUSTOMER_AMOUNT&lt;=0}"/>
+      </transition>
+   </decision>
+   <decision g="2255,2000,310,48" name="Check for Intermediate P2P Flag After Kept Promise">
+      <transition to="Select State After Kept Promise">
+         <condition expr="${PTP_FLAG_I==&apos;N&apos;}"/>
+      </transition>
+      <transition to="Check Open Amount After Kept Promise for Corporate">
+         <condition expr="${PTP_FLAG_I==&apos;Y&apos;}"/>
+            <script expr="N" g="0,0,80,40" var="PTP_FLAG_I"/>
+      </transition>
+   </decision>
+   <decision g="3958,821,225,48" name="Check Wait After SD or Suspension">
+      <transition to="Provisioning Wait Forever">
+         <condition expr="${SD_SUSP_FLAG!=&apos;29&apos; &amp;&amp; SD_SUSP_FLAG!=&apos;41&apos; &amp;&amp; SD_SUSP_FLAG!=&apos;43&apos;}"/>
+      </transition>
+      <transition to="Provisioning Wait Forever1">
+         <condition expr="${SD_SUSP_FLAG==&apos;29&apos; || SD_SUSP_FLAG==&apos;41&apos; || SD_SUSP_FLAG==&apos;43&apos;}"/>
+      </transition>
+   </decision>
+   <state continue="async" g="3811,948,185,52" name="Provisioning Wait Forever">
+      <transition g="-5,-20" name="ContinueWorkflow" to="Tickler For Provisioning Action"/>
+      <transition g="-84,-10" name="SelectCollectionAgency" to="Check State after Assign Collection Agency">
+       <script expr="${SD_SUSP_FLAG}" g="0,0,80,40" var="AGENCY_FLAG"/>
+      </transition>
+      <transition g="3908,1053:-5,-20" name="Payment" to="Check State after Payment InvoiceBalance">
+          <script expr="${SD_SUSP_FLAG}" g="0,0,80,40" var="PAY_FLAG"/>
+          <script expr="2" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+      <transition g="3970,1047:-5,-20" name="InvoiceBalance" to="Check State after Payment InvoiceBalance">
+        <script expr="${SD_SUSP_FLAG}" g="0,0,80,40" var="PAY_FLAG"/>
+        <script expr="2" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+         <script expr="${SD_SUSP_FLAG}" g="0,0,80,40" var="PTP_FLAG"/>
+           <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="${SD_SUSP_FLAG}" g="0,0,80,40" var="PTP_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="3862,918;3842,930:-5,-20" name="AutoRelease" to="Provisioning Wait Forever"/>
+      <transition g="3956,917;3963,931:-5,-20" name="Feedback" to="Provisioning Wait Forever"/>
+      <transition g="3898,908;3882,921:-5,-20" name="IMPT" to="Provisioning Wait Forever"/>
+   </state>
+   <state continue="async" g="4102,955,190,52" name="Provisioning Wait Forever1">
+      <transition g="-5,-20" name="ContinueWorkflow" to="Tickler For Provisioning Action"/>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+         <script expr="${SD_SUSP_FLAG}" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+         <script expr="${SD_SUSP_FLAG}" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="4184,1050:-5,-20" name="Payment" to="Check State for Payment">
+         <script expr="${SD_SUSP_FLAG}" g="0,0,80,40" var="PAY_FLAG"/>
+         <script expr="3" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+      <transition g="4227,1039:-5,-20" name="InvoiceBalance" to="Check State for Payment">
+        <script expr="${SD_SUSP_FLAG}" g="0,0,80,40" var="PAY_FLAG"/>
+        <script expr="3" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+      <transition g="4247,926;4253,943:-25,-7" name="AutoRelease" to="Provisioning Wait Forever1"/>
+      <transition g="4161,924;4154,938:-5,-20" name="IMPT" to="Provisioning Wait Forever1"/>
+   </state>
+   <decision g="4187,1076,175,48" name="Check State for Payment">
+      <transition to="Check PTP Flag For Commission Calculation">
+         <condition expr="${PAY_FLAG==&apos;41&apos; || PAY_FLAG==&apos;43&apos;}"/>
+      </transition>
+      <transition to="Check Open Amount After Payment">
+         <condition expr="${PAY_FLAG==&apos;29&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="3921,1065,260,48" name="Check State after Payment InvoiceBalance">
+      <transition g="3842,1419:" to="Handle WriteOff Action">
+         <condition expr="${PAY_FLAG==&apos;30&apos; || PAY_FLAG==&apos;35&apos;}"/>
+      </transition>
+      <transition to="Check Open Amount After Payment">
+         <condition expr="${PAY_FLAG==&apos;40&apos;}"/>
+      </transition>
+      <transition to="HandleWriteOffAction">
+         <condition expr="${PAY_FLAG==&apos;31&apos; || PAY_FLAG==&apos;32&apos; || PAY_FLAG==&apos;33&apos; || PAY_FLAG==&apos;34&apos; || PAY_FLAG==&apos;36&apos; || PAY_FLAG==&apos;38&apos; || PAY_FLAG==&apos;39&apos; || PAY_FLAG==&apos;37&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="3798,1070,270,48" name="Check State after Assign Collection Agency">
+      <transition to="Assignment to Collection Agency FS76">
+         <condition expr="${AGENCY_FLAG==&apos;40&apos;}"/>
+      </transition>
+      <transition to="Finish Collection Agency">
+         <condition expr="${AGENCY_FLAG!=&apos;40&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="20,910,180,48" name="Check Wait After Release">
+      <transition to="Provisioning Wait Forever After Release">
+         <condition expr="${RELNWRNINV_FLAG!=&apos;29&apos; &amp;&amp; RELNWRNINV_FLAG!=&apos;41&apos; &amp;&amp; RELNWRNINV_FLAG!=&apos;43&apos;}"/>
+      </transition>
+      <transition to="Provisioning Wait Forever After Release1">
+         <condition expr="${RELNWRNINV_FLAG==&apos;29&apos; || RELNWRNINV_FLAG==&apos;41&apos; || RELNWRNINV_FLAG==&apos;43&apos;}"/>
+      </transition>
+   </decision>
+   <state continue="async" g="28,1397,255,52" name="Provisioning Wait Forever After Release">
+      <transition g="-5,-20" name="ContinueWorkflow" to="Select State After Agency Release WriteOff"/>
+      <transition g="-84,-10" name="SelectCollectionAgency" to="Check State after Assign Collection Agency1">
+       <script expr="${RELNWRNINV_FLAG}" g="0,0,80,40" var="AGENCY_FLAG"/>
+      </transition>
+      <transition g="185,1496:-5,-20" name="Payment" to="Check State after Payment InvoiceBalance1">
+          <script expr="${RELNWRNINV_FLAG}" g="0,0,80,40" var="PAY_FLAG"/>
+          <script expr="4" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+      <transition g="229,1481:-5,-20" name="InvoiceBalance" to="Check State after Payment InvoiceBalance1">
+        <script expr="${RELNWRNINV_FLAG}" g="0,0,80,40" var="PAY_FLAG"/>
+        <script expr="4" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+         <script expr="${RELNWRNINV_FLAG}" g="0,0,80,40" var="PTP_FLAG"/>
+           <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+        <script expr="${RELNWRNINV_FLAG}" g="0,0,80,40" var="PTP_FLAG"/>
+          <script expr="Y" g="0,0,80,40" var="COMMISSION_FLAG"/>
+      </transition>
+      <transition g="210,1375;217,1387:-5,-20" name="Feedback" to="Provisioning Wait Forever After Release"/>
+      <transition g="93,1371;81,1385:-5,-20" name="AutoRelease" to="Provisioning Wait Forever After Release"/>
+      <transition g="177,1366;190,1376:-5,-20" name="IMPT" to="Provisioning Wait Forever After Release"/>
+   </state>
+   <state continue="async" g="350,1387,260,52" name="Provisioning Wait Forever After Release1">
+      <transition g="-5,-20" name="ContinueWorkflow" to="Select State After Agency Release WriteOff"/>
+      <transition g="-5,-20" name="PromiseToPay" to="Promise To Pay SubWF">
+         <script expr="${RELNWRNINV_FLAG}" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="-5,-20" name="Installment" to="Payment Plan SubWF">
+         <script expr="${RELNWRNINV_FLAG}" g="0,0,80,40" var="PTP_FLAG"/>
+      </transition>
+      <transition g="482,1477:-5,-20" name="Payment" to="Check State for Payment1">
+         <script expr="${RELNWRNINV_FLAG}" g="0,0,80,40" var="PAY_FLAG"/>
+         <script expr="5" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+      <transition g="437,1471:-5,-20" name="InvoiceBalance" to="Check State for Payment1">
+        <script expr="${RELNWRNINV_FLAG}" g="0,0,80,40" var="PAY_FLAG"/>
+        <script expr="5" g="0,0,80,40" var="PROV_PAY_FLAG"/>
+      </transition>
+      <transition g="534,1359;542,1376:-5,-20" name="AutoRelease" to="Provisioning Wait Forever After Release1"/>
+      <transition g="493,1350;504,1364:-5,-20" name="IMPT" to="Provisioning Wait Forever After Release1"/>
+   </state>
+   <decision g="428,1484,180,48" name="Check State for Payment1">
+   <transition to="Check PTP Flag For Commission Calculation">
+         <condition expr="${PAY_FLAG==&apos;41&apos; || PAY_FLAG==&apos;43&apos;}"/>
+      </transition>
+      <transition to="Check Open Amount After Payment">
+         <condition expr="${PAY_FLAG==&apos;29&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="210,1507,265,48" name="Check State after Payment InvoiceBalance1">
+    <transition g="3842,1419:" to="Handle WriteOff Action">
+         <condition expr="${PAY_FLAG==&apos;30&apos; || PAY_FLAG==&apos;35&apos;}"/>
+      </transition>
+      <transition to="Check Open Amount After Payment">
+         <condition expr="${PAY_FLAG==&apos;40&apos;}"/>
+      </transition>
+      <transition to="HandleWriteOffAction">
+         <condition expr="${PAY_FLAG==&apos;31&apos; || PAY_FLAG==&apos;32&apos; || PAY_FLAG==&apos;33&apos; || PAY_FLAG==&apos;34&apos; || PAY_FLAG==&apos;36&apos; || PAY_FLAG==&apos;38&apos; || PAY_FLAG==&apos;39&apos; || PAY_FLAG==&apos;37&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="61,1511,275,48" name="Check State after Assign Collection Agency1">
+   <transition to="Assignment to Collection Agency FS76">
+         <condition expr="${AGENCY_FLAG==&apos;40&apos;}"/>
+      </transition>
+      <transition to="Finish Collection Agency">
+         <condition expr="${AGENCY_FLAG!=&apos;40&apos;}"/>
+      </transition>
+   </decision>
+   <decision g="310,1250,265,48" name="Check State after Payment InvoiceBalance2">
+   <transition to="Handle WriteOff Action">
+         <condition expr="${PAY_FLAG==&apos;30&apos; || PAY_FLAG==&apos;35&apos;}"/>
+      </transition>
+	   <transition to="HandleWriteOffAction">
+         <condition expr="${PAY_FLAG==&apos;31&apos; || PAY_FLAG==&apos;32&apos; || PAY_FLAG==&apos;33&apos; || PAY_FLAG==&apos;34&apos; || PAY_FLAG==&apos;36&apos; || PAY_FLAG==&apos;37&apos; || PAY_FLAG==&apos;38&apos; || PAY_FLAG==&apos;39&apos;}"/>
+      </transition>
+	  <transition to="Check Open Amount After Payment">
+         <condition expr="${PAY_FLAG==&apos;29&apos; || PAY_FLAG==&apos;40&apos;}"/>
+      </transition>
+	   <transition to="Check PTP Flag For Commission Calculation">
+         <condition expr="${PAY_FLAG==&apos;41&apos; || PAY_FLAG==&apos;43&apos;}"/>
+      </transition>
+   </decision>
+</process>

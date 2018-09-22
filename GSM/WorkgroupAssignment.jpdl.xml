@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler" name="WorkgroupAssignment" xmlns="http://jbpm.org/4.0/jpdl">
+  <start continue="async" g="348,21,185,48" name="Start WorkgroupAssignment">
+    <transition to="Check Execution Error"/>
+  </start>
+  <end g="1746,904,175,48" name="End WorkgroupAssignment"/>
+  <custom g="747,163,220,52" name="Assign To Error_Corp_WG" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignTaskWorkgroup"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="WORKGROUP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Error_Corp_WG"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+    <transition g="1769,188:" to="End WorkgroupAssignment"/>
+  </custom>
+  <custom g="1193,529,195,52" name="Assign Task to Supervisor 1" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="MobinilWorkGroupAssignmentAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="RULE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CORP_SP1"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+    <transition g="1769,555:" to="End WorkgroupAssignment"/>
+  </custom>
+  <decision g="347,165,165,48" name="Check Execution Error">
+    <transition to="Check Strategy Type">
+      <condition expr="${TASK_NAME != &quot;VerifyExecutionError&quot;}"/>
+    </transition>
+    <transition to="Check Custcode Starts With after Error">
+      <condition expr="${TASK_NAME == &quot;VerifyExecutionError&quot;}"/>
+    </transition>
+  </decision>
+  <decision g="347,331,155,48" name="Check Strategy Type">
+      <handler class="com.mobinil.decision.handler.CustCodeValidator"/>
+    <transition g="-11,-20" name="F" to="Check Task Name">
+    </transition>
+    <transition g="-12,-20" name="T" to="Consumer Assignment">
+    </transition>
+  </decision>
+  <decision g="757,530,135,48" name="Check Collector">
+    <transition to="Assign Task to Supervisor 1">
+      <condition expr="${COLLECTOR == &quot;CSCCRDG2&quot; || COLLECTOR == &quot;CSCCRDG9&quot; || COLLECTOR == &quot;CSCCRD92&quot; || COLLECTOR == &quot;CSCCRDE9&quot; || COLLECTOR == &quot;CSCCRDB3&quot; || COLLECTOR == &quot;CSCCRD31&quot; || COLLECTOR == &quot;CSCCRDE1&quot; || COLLECTOR == &quot;CSCCRDG4&quot; || COLLECTOR == &quot;CSCCRDG6&quot;}"/>
+    </transition>
+    <transition g="781,766:" to="Assign Task to Supervisor 2">
+      <condition expr="${COLLECTOR == &quot;CSCCRDC8&quot; || COLLECTOR == &quot;CSCCRDB8&quot; || COLLECTOR == &quot;CSCCRDC1&quot; || COLLECTOR == &quot;CSCCRDE7&quot; || COLLECTOR == &quot;CSCCRDD6&quot; || COLLECTOR == &quot;CSCCRDD9&quot; || COLLECTOR == &quot;CSCCRD69&quot; || COLLECTOR == &quot;CSCCRD88&quot;  || COLLECTOR == &quot;CSCCRDF1&quot;  || COLLECTOR == &quot;CSCCRDF7&quot;  || COLLECTOR == &quot;CSCCRDG1&quot;  || COLLECTOR == &quot;CSCCRD82&quot;  || COLLECTOR == &quot;Auto&quot;}"/>
+    </transition>
+    <transition g="781,861:" to="Assign Task to Supervisor 3">
+      <condition expr="${COLLECTOR == &quot;CSCCRDA8&quot; || COLLECTOR == &quot;CSCCRDC0&quot; || COLLECTOR == &quot;CSCCRDB9&quot; || COLLECTOR == &quot;CSCCRD91&quot; || COLLECTOR == &quot;CSCCRD83&quot; || COLLECTOR == &quot;CSCCRDF8&quot; || COLLECTOR == &quot;CSCCRDF9&quot; || COLLECTOR == &quot;CSCCRDG3&quot; || COLLECTOR == &quot;CSCCRDG5&quot; || COLLECTOR == &quot;CSCCRDG7&quot;}"/>
+    </transition>
+  </decision>
+  <custom g="1194,740,195,52" name="Assign Task to Supervisor 2" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="MobinilWorkGroupAssignmentAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="RULE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CORP_SP2"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+    <transition g="1769,766:" to="End WorkgroupAssignment"/>
+  </custom>
+  <custom g="1192,836,195,52" name="Assign Task to Supervisor 3" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="MobinilWorkGroupAssignmentAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="RULE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CORP_SP3"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+    <transition g="1769,862:" to="End WorkgroupAssignment"/>
+  </custom>
+  <decision g="347,530,135,48" name="Check Task Name">
+    <transition to="Check Collector">
+      <condition expr="${TASK_NAME == &quot;05-SUPRV-CC81&quot;||TASK_NAME == &quot;05-SUPRV-CC82&quot;||TASK_NAME == &quot;05-SUPRV-CC83&quot;||TASK_NAME == &quot;05-SUPRV-CC84&quot; ||TASK_NAME == &quot;05-SUPRV-DD81&quot; || TASK_NAME == &quot;05-SUPRV-DD82&quot;}"/>
+    </transition>
+    <transition to="exclusive2">
+      <condition expr="${TASK_NAME != &quot;05-SUPRV-CC81&quot; &amp;&amp; TASK_NAME != &quot;05-SUPRV-CC82&quot; &amp;&amp; TASK_NAME != &quot;05-SUPRV-CC83&quot; &amp;&amp; TASK_NAME != &quot;05-SUPRV-CC84&quot; &amp;&amp; TASK_NAME != &quot;05-SUPRV-DD81&quot; &amp;&amp; TASK_NAME != &quot;05-SUPRV-DD82&quot;}"/>
+    </transition>
+  </decision>
+  <custom g="753,330,222,52" name="Consumer Assignment" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="MobinilWorkGroupAssignmentAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="RULE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CONS_RL"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+    <transition g="1769,356:" to="End WorkgroupAssignment"/>
+  </custom>
+  <decision g="347,950,48,48" name="exclusive2">
+    <transition to="Normal Corporate Customer">
+      <condition expr="${TASK_NAME!=&apos;03-BP-01-CorpOOPS-WF&apos; &amp;&amp; TASK_NAME!=&apos;03-BP-01-CorpRoam-WF&apos; &amp;&amp; TASK_NAME!=&apos;01-ROAM-01-CorpRoam-WF&apos; &amp;&amp; TASK_NAME!=&apos;01-ROAM-02-CorpOOPS-WF&apos; &amp;&amp; TASK_NAME!=&apos;02-OOPS-01-CorpOOPS-WF&apos; &amp;&amp; TASK_NAME!=&apos;06-Hold-07-CorpOOPS-WF02&apos; &amp;&amp; TASK_NAME!=&apos;06-Hold-07-CorpRoam-WF02&apos; &amp;&amp; TASK_NAME!=&apos;03-BP-06-FS03&apos;}"/>
+    </transition>
+    <transition to="exclusive1">
+      <condition expr="${TASK_NAME==&apos;03-BP-01-CorpOOPS-WF&apos; || TASK_NAME==&apos;03-BP-01-CorpRoam-WF&apos; || TASK_NAME==&apos;01-ROAM-01-CorpRoam-WF&apos; || TASK_NAME==&apos;01-ROAM-02-CorpOOPS-WF&apos; || TASK_NAME==&apos;02-OOPS-01-CorpOOPS-WF&apos; || TASK_NAME==&apos;06-Hold-07-CorpOOPS-WF02&apos; ||  TASK_NAME==&apos;06-Hold-07-CorpRoam-WF02&apos; || TASK_NAME==&apos;03-BP-06-FS03&apos;}"/>
+    </transition>
+  </decision>
+  <custom g="279,1267,185,52" name="Normal Corporate Customer" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="MobinilWorkGroupAssignmentAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="RULE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CORP_CL"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+    <transition g="499,1223;750,1223;1769,1223:" to="End WorkgroupAssignment"/>
+  </custom>
+  <decision g="696,950,48,48" name="exclusive1">
+    <transition to="Corporate Auto">
+      <condition expr="${COLLECTOR==&apos;Auto&apos;}"/>
+    </transition>
+    <transition to="exclusive5">
+      <condition expr="${COLLECTOR!=&apos;Auto&apos;}"/>
+    </transition>
+  </decision>
+  <custom g="980,948,154,52" name="Corporate Auto" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="MobinilWorkGroupAssignmentAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="RULE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CORP_AUTO"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+    <transition g="1769,973:" to="End WorkgroupAssignment"/>
+  </custom>
+  <decision g="696,1099,48,48" name="exclusive3">
+    <transition to="Corporate Internal And Family">
+      <condition expr="${CORPORATE_CATEGORY==&quot;INTERNAL USER BUSINESS&quot; || CORPORATE_CATEGORY==&quot;INTERNAL USER FAMILY-LINE&quot;}"/>
+    </transition>
+    <transition to="exclusive4">
+      <condition expr="${CORPORATE_CATEGORY!=&quot;INTERNAL USER BUSINESS&quot; &amp;&amp; CORPORATE_CATEGORY!=&quot;INTERNAL USER FAMILY-LINE&quot;}"/>
+    </transition>
+  </decision>
+  <custom g="994,1097,205,52" name="Corporate Internal And Family" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="MobinilWorkGroupAssignmentAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="RULE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CORP_INTF"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+    <transition g="1769,1122:" to="End WorkgroupAssignment"/>
+  </custom>
+  <decision g="696,1268,48,48" name="exclusive4">
+    <transition to="Normal Corporate Customer">
+         <condition expr="${CSLEVEL!=&quot;40&quot;}"/>
+      </transition>
+    <transition to="exclusive6">
+      <condition expr="${CSLEVEL==&quot;40&quot;}"/>
+    </transition>
+  </decision>
+  <custom g="1250,1267,175,52" name="Corporate OOPS IUC Hold" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="MobinilWorkGroupAssignmentAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="RULE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CORP_HOLD"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+    <transition g="1769,1293:" to="End WorkgroupAssignment"/>
+  </custom>
+  <decision g="1045,1268,48,48" name="exclusive6">
+    <transition to="Corporate OOPS IUC Hold">
+      <condition expr="${TASK_NAME==&apos;06-Hold-07-CorpOOPS-WF02&apos; || TASK_NAME==&apos;06-Hold-07-CorpRoam-WF02&apos;}"/>
+    </transition>
+    <transition g="1069,1388:" to="Corporate OOPS IUC ">
+      <condition expr="${TASK_NAME!=&apos;06-Hold-07-CorpOOPS-WF02&apos; &amp;&amp; TASK_NAME!=&apos;06-Hold-07-CorpRoam-WF02&apos;}"/>
+    </transition>
+  </decision>
+  <custom g="1258,1362,155,52" name="Corporate OOPS IUC " class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="MobinilWorkGroupAssignmentAction"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="RULE_NAME"/>
+               </key>
+               <value>
+                  <object expr="CORP_IUC"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+    <transition g="1769,1388:" to="End WorkgroupAssignment"/>
+  </custom>
+   <custom g="782,21,175,52" name="Assign To Error_Cons_WG" class="com.lhs.wma.wfms.jbpm4.WFMSActionAssignment" exception-listener="com.lhs.wma.wfms.jbpm4.WFMSExceptionHandler">
+      <field name="actionName">
+         <string value="AssignTaskWorkgroup"/>
+      </field>
+      <field name="variables">
+         <map class="java.util.HashMap">
+            <entry>
+               <key>
+                  <string value="WORKGROUP_NAME"/>
+               </key>
+               <value>
+                  <object expr="Error_Cons_WG"/>
+               </value>
+            </entry>
+         </map>
+      </field>
+      <transition g="1769,47:" to="End WorkgroupAssignment"/>
+   </custom>
+   <decision g="579,165,250,48" name="Check Custcode Starts With after Error">
+      <handler class="com.mobinil.decision.handler.CustCodeValidator"/>
+      <transition g="603,46:-12,-20" name="T" to="Assign To Error_Cons_WG"/>
+      <transition g="-11,-20" name="F" to="Assign To Error_Corp_WG"/>
+   </decision>
+   <decision g="696,1020,48,48" name="exclusive5">
+      <transition to="exclusive3">
+         <condition expr="${TASK_NAME!=&apos;03-BP-06-FS03&apos;}"/>
+      </transition>
+      <transition g="594,1153:" to="exclusive4">
+         <condition expr="${TASK_NAME==&apos;03-BP-06-FS03&apos;}"/>
+      </transition>
+   </decision>
+</process>
